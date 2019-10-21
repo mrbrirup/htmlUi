@@ -1,0 +1,14 @@
+html,body{height:100vh;margin:0;padding:0}
+.Mrbr-UI-Containers-AppContainer:before{
+    content: '';
+    display: block;
+    width: 100vw;
+    height: .01em;    
+}
+.Mrbr-UI-Containers-AppContainer{
+    background-color: white;
+    height:100vh;
+    width:100vw;    
+    padding:0;
+    margin:0;
+}
