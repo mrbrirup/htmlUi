@@ -4,7 +4,8 @@ class {
     static get manifest() {
         const entry = Mrbr.System.ManifestEntry;
         return [
-            new entry(entry.FileTypes.Style, "Mrbr.UI.Containers.AppContainer")
+            new entry(entry.FileTypes.Style, "Mrbr.UI.Containers.AppContainer"),
+            new entry(entry.FileTypes.Style, "Mrbr.UI.Style.Default")
         ];
     }
     constructor(...args) {
