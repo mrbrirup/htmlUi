@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Test Doc</title>
+</head>
+
+<style>
+    :root {
+        --default-control-padding: 0.25rem;
+        --default-control-font-size: 12px;
+        --default-control-background-color: azure;
+        --default-control-resize-bar-size: 0.0rem;
+        --default-control-resize-bar-border: silver thin solid;
+    }
+</style>
+<style>
+    body {
+        padding: 0px;
+        margin: 0px;
+        font-size: var(--default-control-font-size);
+        background-color: white
+    }
+
+    .app-container {
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .docker-vertical-row {
+        display: flex;
+        flex-direction: row;
+        flex-flow: row nowrap;
+        width: 100%;
+        height: 100%;
+    }
+
+    .docker-vertical-column {
+        box-sizing: border-box;
+        display: flex;
+        flex-flow: nowrap;
+        flex-direction: column;
+        height: 100%;
+        padding: var(--default-control-padding);
+        height: inherit;
+        overflow: hidden;
+    }
+
+    
+    .resize-bar-vertical {
+        background-color: var(--default-control-background-color);
+        width: var(--default-control-resize-bar-size);
+        cursor: ew-resize;
+        box-sizing: border-box;
+        border-left: var(--default-control-resize-bar-border);
+        border-right: var(--default-control-resize-bar-border);
+    }
+    
+    .docker-first-panel {
+        order: 1;
+    }
+    .docker-first-resizer {
+        order: 2;
+    }
+
+    .docker-centre-panel {
+        flex: 1;
+        order: 3;
+    }
+
+    .docker-last-resizer {
+        order: 4;
+    }
+
+    .docker-last-panel {
+        order: 5;
+    }
+</style>
+
+<body>
+    <div class="app-container">
+        <div class="docker-vertical-row">
+            <div id="first-vertical-panel" class="docker-vertical-column docker-first-panel"></div>
+            <div id="docker-first-resizer" class="docker-vertical-column docker-first-resizer resize-bar-vertical"></div>
+            <div class="docker-vertical-column docker-centre-panel"></div>
+            <div id="docker-last-resizer" class="docker-vertical-column docker-last-resizer resize-bar-vertical"></div>
+            <div id="last-vertical-panel" class="docker-vertical-column docker-last-panel"></div>
+        </div>
+    </div>
+    <script>
+        class resizer {
+            static get currentResizer() {
+                return resizer._currentResizer;
+            }
+            static set currentResizer(value) { resizer._currentResizer = value; }
+            constructor(elementName, resizerName, direction) {
+                const self = this;
+                if (resizer._currentResizer === undefined) { resizer._currentResizer = null; }
+                self.element = document.getElementById(elementName);
+                self.resizer = document.getElementById(resizerName);
+                self.resizer.addEventListener('mousedown', self.initResize.bind(self), false);
+                self.resizerSymbol = Symbol("resizer")
+                self.timeOut = false;
+                self.timeOutDelay = 1;
+                const 
+                selfTimeOut = self.timeOut,
+                selfTimeOutDelay = self.timeOutDelay,
+                selfDebounce = resizer.debounce.bind(self);
+                self.event_resizeHandle = selfDebounce(self.resize.bind(self), selfTimeOutDelay, false, self, selfTimeOut);
+                self.event_stopResizeHandle = self.stopResize.bind(self);
+                self.direction = direction;
+                self.start = 0;
+                self.end = 0;
+                self.startSize = 0;
+                self.deltaMultiplier = (self.direction === "right" || self.direction === "bottom") ? -1 : 1;
+            }
+            initResize(event) {
+                const self = this;
+                if (resizer.currentResizer !== null) { return; }
+                resizer.currentResizer = self.resizerSymbol;
+                self.start = event.clientX;
+                self.end = event.clientX;
+                self.startSize = self.element.offsetWidth;                
+                window.addEventListener('mousemove', self.event_resizeHandle, false);
+                window.addEventListener('mouseup', self.event_stopResizeHandle, { capture: false, once: true });
+            }
+            get delta() {
+                const self = this;
+                return (self.end - self.start) * self.deltaMultiplier;
+            }
+            resize(event) {
+                const self = this;
+                if (resizer.currentResizer !== self.resizerSymbol) { return; }
+                self.end = event.clientX;
+                self.element.style.width = (self.startSize + self.delta) + 'px';
+            }
+            stopResize(event) {
+                const self = this;
+                if (resizer.currentResizer !== this.resizerSymbol) { return; }
+                window.removeEventListener('mousemove', self.event_resizeHandle, false);
+                window.removeEventListener('mouseup', self.event_stopResizeHandle, false);
+                resizer.currentResizer = null;
+            }
+            static debounce(func, wait, immediate, timeout) {
+                return function () {
+                    const context = this, args = arguments;
+                    const later = function () {
+                        timeout = null;
+                        if (!immediate) func.apply(context, args);
+                    };
+                    const callNow = immediate && !timeout;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                    if (callNow) func.apply(context, args);
+                };
+            };
+        }
+        var r = new resizer('first-vertical-panel', 'docker-first-resizer', "left");
+        var r2 = new resizer('last-vertical-panel', 'docker-last-resizer', "right");
+    </script>
+</body>
+
+</html>

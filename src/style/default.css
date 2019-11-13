@@ -1,3 +1,6 @@
 :root{
-    --bgc: red;
+    --default-control-padding: 0.25rem;
+    --default-control-font-size: 12px;
+    --default-control-background-color: gray;
+    --default-control-resize-bar-size: 0.0rem;
 }

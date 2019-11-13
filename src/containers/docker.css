@@ -1,5 +1,13 @@
 .Mrbr-UI-Containers-Docker{
     width:100%;
     height:100%;
-    background-color: aqua;    
+    /*background-color: aqua;    */
+    display: block;
 }
+body {
+    padding: 0px;
+    margin: 0px;
+    font-size: var(--default-control-font-size);
+    background-color: white
+}
+
