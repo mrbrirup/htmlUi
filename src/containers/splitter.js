@@ -1,8 +1,6 @@
 class extends HTMLElement {
     constructor() {
         super();
-        // element created
-         //this.innerHTML = '<div></div>';
          this._resizeTarget = null;
       }
       get resizeTarget() {
@@ -20,43 +18,14 @@ class extends HTMLElement {
       set direction(value) {
         this.setAttribute('direction', value);
       }
-
+      
+      get orientation(){return this.getAttribute("orientation");}
+      set orientation(value){this.setAttribute("orientation", value);}
       connectedCallback() {
 
         const self = this,
-        config = self.config;//,
-        //docker = Mrbr.UI.Containers.Docker,
-        //MrbrUIContainersDocker = Mrbr.UI.Containers.Docker,
-        //rxOrientation = MrbrUIContainersDocker.RxOrientation,
-        //rxContainer = MrbrUIContainersDocker.RxContainer,
-        //orientation = self.orientation;//,
-        //MrbrHtmlDiv = Mrbr.Html.Div,
-        //panelSuffix = ["first", "centre", "last"];
-        //self.attachShadow({ mode: 'open' });
-
-        //self.classList.add("docker-orientation-column".replace(rxOrientation,`-${orientation}-`))
-        //self.classList.add("docker-horizontal-column")
-
-        //alert   ()        
-        
-        // if (typeof self._currentResizer === undefined) { self._currentResizer = null; }
-        
-        // if (self.panelPositions & docker.panelPosition.top &&  self.resizePositions & docker.resizePosition.top){
-        //     self.resizers["docker-first-resizer1"] = [self.shadowRoot.getElementById("docker-first-resizer1"), self.shadowRoot.getElementById("first-horizontal-panel"), 1];
-        // }
-        // if (self.panelPositions & docker.panelPosition.bottom && self.resizePositions & docker.resizePosition.bottom){
-        //     self.resizers["docker-last-resizer1"] = [self.shadowRoot.getElementById("docker-last-resizer1"), self.shadowRoot.getElementById("last-horizontal-panel"), -1];
-        // }
-
-        // self.currentResizer = null;
-        // Object.keys(self.resizers).forEach(resizePair => {
-        //     let resizer = self.resizers[resizePair][0];
-        //     let element = self.resizers[resizePair][1];
-        //     resizer = self.shadowRoot.getElementById(resizer.id);
-        //     element = self.shadowRoot.getElementById(element.id);
-        self.orientation = "horizontal"
+        config = self.config;
         self.addEventListener('mousedown', self.initResize.bind(self), false);
-        // });
         self.timeOut = false;
         self.timeOutDelay = 1;
         const selfTimeOut = self.timeOut,
@@ -67,27 +36,25 @@ class extends HTMLElement {
         self.start = 0;
         self.end = 0;
         self.startSize = 0;
-        //self.direction = "top";//config.direction;
         self.deltaMultiplier = (self.direction === "right" || self.direction === "bottom") ? -1 : 1;        
     }
     initResize(event) {
         const self = this;
         self.element = self.resizeTarget;
-        //self.currentResizer = event.currentTarget.id;
         if (self.orientation === "horizontal") {
             self.start = self.end = event.clientY;
             self.startSize = self.element.offsetHeight;
         }
         else {
             self.start = self.end = event.clientX;
-            self.startSize = self.resizers[self.currentResizer][1].offsetWidth;
+            self.startSize = self.element.offsetWidth;
         }
         window.addEventListener('mousemove', self.event_resizeHandle, false);
         window.addEventListener('mouseup', self.event_stopResizeHandle, { capture: false, once: true });
     }
     get delta() {
         const self = this;
-        return (self.end - self.start) * self.deltaMultiplier * (self.direction ==="top" ? 1 : -1);
+        return (self.end - self.start) * self.deltaMultiplier ;//* (self.direction ==="top" ? 1 : -1);
     }
     size(position) {
         const self = this;

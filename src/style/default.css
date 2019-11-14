@@ -3,4 +3,6 @@
     --default-control-font-size: 12px;
     --default-control-background-color: gray;
     --default-control-resize-bar-size: 0.0rem;
+    --default-control-toolbar-size:2rem;
+    --default-control-border: 1px black solid;
 }
