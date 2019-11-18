@@ -1,0 +1,5 @@
+mrbr-ui-containers-taskbar{
+    height:  var(--default-control-toolbar-size);
+    background-color:  var(--default-control-background-color);
+    box-sizing: border-box;
+}

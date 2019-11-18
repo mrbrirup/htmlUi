@@ -1,8 +1,16 @@
 :root{
+    --default-control-font: "Arial";
     --default-control-padding: 0.25rem;
-    --default-control-font-size: 12px;
+    --default-size: 12;
+    --default-control-font-size:  calc(var(--default-size) * 1px);
+    --default-control-font-color:white;
     --default-control-background-color: gray;
     --default-control-resize-bar-size: 0.0rem;
     --default-control-toolbar-size:2rem;
     --default-control-border: 1px black solid;
+    --default-icon-size-0: 1rem;
+    --default-icon-size-1: 1.5rem;
+    --default-icon-size-2: 2rem;
+    --default-icon-size-3: 3rem;
+    --default-control-animation-speed: 0.25s;
 }

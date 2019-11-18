@@ -1,4 +1,11 @@
 html,body{height:100vh;margin:0;padding:0}
+body {
+    padding: 0px;
+    margin: 0px;
+    font-size: var(--default-control-font-size);
+    background-color: white;
+    font-family: var(--default-control-font);
+}
 .Mrbr-UI-Containers-AppContainer:before{
     content: '';
     display: block;

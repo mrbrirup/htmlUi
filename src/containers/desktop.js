@@ -14,9 +14,9 @@ class extends HTMLElement {
         var self = this;
         self.appContainer = new Mrbr.UI.Containers.AppContainer();
         self.appContainer.appendChild(self);
-        let docker = new Mrbr.UI.Containers.Docker({ layoutStyle: Mrbr.UI.Containers.Docker.orientation.horizontal, direction: "top", orientation: "horizontal", panelPositions: 2 });
+        let docker = new Mrbr.UI.Containers.Docker({ layoutStyle: Mrbr.UI.Containers.Docker.orientation.horizontal, orientation: "horizontal", panelPositions: 3 });
         let taskBar = new Mrbr.UI.Containers.TaskBar();
-        docker.panels.bottom.appendChild( taskBar)
+        docker.panels.top.appendChild( taskBar)
         this.appendChild(docker);
     }
 }

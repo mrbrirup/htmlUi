@@ -1,0 +1,34 @@
+.button-display {
+    display: flex;
+}
+mrbr-ui-controls-button > button {
+    height:100%;
+    border: none;
+}
+.button-display-imagetext-horizontal {
+    flex-flow: row;
+}
+.button-display-textimage-horizontal {
+    flex-flow: row-reverse;
+}
+.button-display-imagetext-vertical {
+    flex-flow: column;
+}
+.button-display-textimage-vertical {
+    flex-flow: column-reverse;
+}
+.button-image {    
+    height: var(--default-icon-size-1);
+    width: var(--default-icon-size-1);
+}
+.button-display-content-horizontal {
+    margin: auto 0.125rem auto 0.125rem;
+    vertical-align: middle;
+}
+ .button-display-content-vertical {
+    margin: 0.125rem auto 0.125rem auto;
+    text-align: center;
+}
+.button-display-imagetext-horizontal > img {
+    margin-left: 0px;
+}

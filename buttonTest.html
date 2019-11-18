@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+<link type="text/css" href="src/style/default.css" rel="stylesheet" />
+<style>
+body, html {
+    padding: 0px;
+    margin: 0px
+}
+.button-display {
+    display: flex;
+}
+.button-display-imagetext-horizontal {
+    flex-flow: row;
+}
+
+.button-display-textimage-horizontal {
+    flex-flow: row-reverse;
+}
+.button-display-imagetext-vertical {
+    flex-flow: column;
+}
+.button-display-textimage-vertical {
+    flex-flow: column-reverse;
+}
+
+
+h1:before {
+    content: '';
+    display: block;
+    height: .01em;
+}
+.button-image {    
+    height: var(--default-icon-size-1);
+    width: var(--default-icon-size-1);
+}
+.button-display-content-horizontal {
+    margin: auto 0.125rem auto 0.125rem;
+    vertical-align: middle;
+}
+ .button-display-content-vertical {
+    margin: 0.125rem auto 0.125rem auto;
+    text-align: center;
+}
+.button-display-imagetext-horizontal > img {
+    margin-left: 0px;
+}
+
+</style>
+</head>
+
+<body> 
+<button id="btn1" text="Hello World" src="icons8-phone-48.png" orientation="horizontal" order="imageText" ></button>
+<h1></h1>
+    
+    <script>
+        document.getElementById("btn1").addEventListener("click", function(){alert("click"); return false})
+    </script>
+    
+</body>
+</html>

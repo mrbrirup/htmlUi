@@ -53,9 +53,8 @@ class extends HTMLElement {
         div.direction = direction;
         return div;
     }
-    constructor(config) {
-        super();
-        const orientationClasses = {
+    static get orientationClasses() {
+        return {
             horizontal: {
                 container: "docker-horizontal-column",
                 orientationPanel: "docker-panel-vertical",
@@ -75,12 +74,14 @@ class extends HTMLElement {
                 last: "right"
             }
         }
+    }
+    constructor(config) {
+        super();
         config = config || {};
         const docker = Mrbr.UI.Containers.Docker,
             self = this;
-        self.classList.add("Mrbr-UI-Containers-Docker")
         self.orientation = config.orientation ? config.orientation : "horizontal"
-        const orientationConfig = orientationClasses[self.orientation]
+        const orientationConfig = Mrbr.UI.Containers.Docker.orientationClasses[self.orientation]
         self.orientation = (config.orientation !== undefined) ? config.orientation : docker.orientation.horizontal;
         self.panelPositions = (typeof config.panelPositions === undefined) ? 0 : config.panelPositions;
         self.resizePositions = (typeof config.resizerPositions === undefined) ? 0 : config.resizePositions;

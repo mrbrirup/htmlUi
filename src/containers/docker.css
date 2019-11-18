@@ -1,14 +1,7 @@
-.Mrbr-UI-Containers-Docker{
+mrbr-ui-containers-docker{
     width:100%;
     height:100%;
-    /*background-color: aqua;    */
     display: block;
-}
-body {
-    padding: 0px;
-    margin: 0px;
-    font-size: var(--default-control-font-size);
-    background-color: white
 }
 
 .docker-horizontal-column {            
