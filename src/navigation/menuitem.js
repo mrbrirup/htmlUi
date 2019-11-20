@@ -2,8 +2,8 @@ class extends HTMLElement {
     static get manifest() {
         const entry = Mrbr.System.ManifestEntry;
         return [
-            new entry(entry.FileTypes.Style, "Mrbr.UI.Navigation.Menu"),
-            new entry(entry.FileTypes.Component, "Mrbr.UI.Navigation.SubMenu"),
+            /*new entry(entry.FileTypes.Style, "Mrbr.UI.Navigation.Menu"),*/
+            new entry(entry.FileTypes.Component, "Mrbr.UI.Navigation.SubMenu")
         ];
     }
     constructor() {

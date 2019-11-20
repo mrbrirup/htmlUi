@@ -4,6 +4,7 @@
 mrbr-ui-controls-button > button {
     height:100%;
     border: none;
+    display: block;
 }
 .button-display-imagetext-horizontal {
     flex-flow: row;
@@ -18,8 +19,8 @@ mrbr-ui-controls-button > button {
     flex-flow: column-reverse;
 }
 .button-image {    
-    height: var(--default-icon-size-1);
-    width: var(--default-icon-size-1);
+    height: var(--default-icon-size-0);
+    width: var(--default-icon-size-0);
 }
 .button-display-content-horizontal {
     margin: auto 0.125rem auto 0.125rem;

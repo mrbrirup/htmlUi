@@ -12,7 +12,7 @@ class extends HTMLElement {
         this.button = new Mrbr.UI.Controls.Button();
         this.button.src= Mrbr.System.Assembly.resolveNamespaceToFile("Mrbr.UI.Resources.Images.menu-button-of-three-horizontal-lines","svg")
         this.menu = new Mrbr.UI.Navigation.Menu();
-        this.menu.direction = "down";
+        this.menu.direction = "up";
     }
     connectedCallback() {
         this.button.appendChild(this.menu);
@@ -44,9 +44,12 @@ class extends HTMLElement {
         m3.menuItems.appendChild(m5);
         m3.menuItems.appendChild(m6);
 
-        this.button.addEventListener("click", function(){self.menu.style.display = "block"})
-        self.button.addEventListener("mouseleave", function(){self.menu.style.display = "none"});
-
+        //this.button.addEventListener("click", function(){self.menu.style.display = "block"})
+        self.button.addEventListener("click", function(){
+            self.menu.classList.add("show");
+            self.menu.nav.classList.add("show");});
+        self.button.addEventListener("mouseleave", function(){self.menu.classList.remove("show")});
+        
 
         // browser calls this method when the element is added to the document
         // (can be called many times if an element is repeatedly added/removed)
