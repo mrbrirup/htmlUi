@@ -13,6 +13,8 @@ class extends HTMLElement {
         this.button.src= Mrbr.System.Assembly.resolveNamespaceToFile("Mrbr.UI.Resources.Images.menu-button-of-three-horizontal-lines","svg")
         this.menu = new Mrbr.UI.Navigation.Menu();
         this.menu.direction = "up";
+        this.button.style.backgroundColor = "var(--default-colour-menu)"
+        this.button.style.color = "var(--default-colour-menu-text)"                
     }
     connectedCallback() {
         this.button.appendChild(this.menu);
@@ -45,11 +47,47 @@ class extends HTMLElement {
         m3.menuItems.appendChild(m6);
 
         //this.button.addEventListener("click", function(){self.menu.style.display = "block"})
-        self.button.addEventListener("click", function(){
-            self.menu.classList.add("show");
-            self.menu.nav.classList.add("show");});
-        self.button.addEventListener("mouseleave", function(){self.menu.classList.remove("show")});
-        
+        self.button.addEventListener("click", function(event){
+            if(!self.menu.classList.contains("show")){
+                self.menu.classList.add("show");
+                window.requestAnimationFrame(function(){self.menu.nav.classList.add("show");
+                window.requestAnimationFrame(function(){self.menu.nav.classList.add("show");})});                
+            }
+            else{
+                self.menu.classList.remove("show");
+                self.menu.nav.classList.remove("show");    
+            }
+
+            event.stopPropagation();
+            return false;
+            });
+        self.button.addEventListener("mouseleave", function(){
+            self.menu.classList.remove("show");
+            self.menu.nav.classList.remove("show");
+        });
+        self.menu.nav.addEventListener("click", function(event){
+            const entry = Mrbr.System.ManifestEntry;
+            Mrbr.System.Assembly.loadManifest(
+                new entry(entry.FileTypes.Component, "Mrbr.UI.Forms.Form"),
+
+            ).then(_=>{
+                
+                let w = document.createElement("mrbr-ui-forms-form")
+                w.name ="name1";
+                w.title = "title1";
+                w.height = "200";
+                w.width = "200";
+                w.innerHTML = `<p>Credits:</p>
+                <p>Stuff</p>
+                <button onclick="alert('Ok')"> ok </button>`
+                application.desktop.style.overflow = "hidden";
+                application.desktop.docker.style.overflow = "hidden";
+                application.desktop.docker.panels.content.style.overflow = "hidden";
+                application.desktop.docker.panels.content.appendChild(w);
+            });
+            event.stopPropagation();
+            return false;
+        })
 
         // browser calls this method when the element is added to the document
         // (can be called many times if an element is repeatedly added/removed)

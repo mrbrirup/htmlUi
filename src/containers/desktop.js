@@ -14,9 +14,14 @@ class extends HTMLElement {
         var self = this;
         self.appContainer = new Mrbr.UI.Containers.AppContainer();
         self.appContainer.appendChild(self);
-        let docker = new Mrbr.UI.Containers.Docker({ layoutStyle: Mrbr.UI.Containers.Docker.orientation.horizontal, orientation: "horizontal", panelPositions: 3 });
+        self.docker = new Mrbr.UI.Containers.Docker({ layoutStyle: Mrbr.UI.Containers.Docker.orientation.horizontal, orientation: "horizontal", panelPositions: 3 });
         let taskBar = new Mrbr.UI.Containers.TaskBar();
-        docker.panels.bottom.appendChild( taskBar)
-        this.appendChild(docker);
+        self.docker.panels.bottom.appendChild( taskBar)
+        self.docker.panels.bottom.style.backgroundColor = "transparent";
+        self.docker.panels.content.style.backgroundColor = "var(--default-colour-desktop)";
+        // --default-colour-menu: rgb(212, 208, 200);
+        // --default-colour-menu-text: rgb(0, 0, 0);
+    
+        this.appendChild(self.docker);
     }
 }

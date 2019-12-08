@@ -1,0 +1,109 @@
+.Menu {
+    color: black;
+}
+    /* Foreground */
+    .Menu,
+    .Menu mrbr-ui-menuitem.-hasSubmenu > a:after {
+        color: black;
+        border-color: black; /* chevron colour */
+    }
+
+    /* Background */
+    .Menu,
+    .Menu mrbr-ui-menuitem mrbr-ui-menu {
+        background: white;
+    }
+
+    /* Border */
+    .Menu,
+    .Menu mrbr-ui-menuitem mrbr-ui-menu {
+        box-shadow: none;
+    }
+
+    .Menu mrbr-ui-menuitem mrbr-ui-menu,
+    .Menu.-floating {
+        border-radius: 3px;
+    }
+    .Menu.-horizontal > mrbr-ui-menuitem > mrbr-ui-menu {
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+    }
+    .Menu:not(.-alignRight) mrbr-ui-menuitem > mrbr-ui-menu,
+    .Menu.-floating:not(.-alignRight) {
+        border-top-left-radius: 0px;
+    }
+    .Menu.-alignRight mrbr-ui-menuitem > mrbr-ui-menu,
+    .Menu.-floating.-alignRight {
+        border-top-right-radius: 0px;
+    }
+
+/* Drop shadow on Menus and header */
+.Header,
+.Menu mrbr-ui-menuitem mrbr-ui-menu,
+.Menu.-floating {
+    box-shadow:
+        0px 0px 0px 1px rgba(0,0,0,0.2),
+        0px 3px 1px 0px rgba(0,0,0,0.2),
+        0px 6px 12px 0px rgba(0,0,0,0.15)
+    ;
+}
+
+.Header {
+    position: fixed;
+    display: block;
+    z-index: 100;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+}
+    /* Header and Menu sizing */
+    .Header .Menu {
+        line-height: 40px;
+    }
+    .Header,
+    .Header .Menu.-horizontal,
+    .Header .Menu mrbr-ui-menuitem,
+    .Header .Menu mrbr-ui-menuitem > :first-child {
+        height: 40px;
+    }
+    .Header .Menu *[data-icon]:before,
+    .Header .Menu .Icon {
+        width: 40px;
+        height: 40px;
+    }
+    .Header .Menu *[data-icon] {
+        min-width: 40px;
+        min-height: 40px;
+        padding-left: 40px;
+    }
+
+    /* Menu positioning in Header */
+    .Header .Menu.-horizontal {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+    .Header .Menu.-horizontal.-alignRight {
+        left: auto;
+        right: 0px;
+    }
+
+    /* Colouring/styling of Header and its Menus */
+    .Header {
+        background: rgba(0,0,0,0.8);
+    }
+    .Header .Menu {
+        background: none;
+    }
+    .Header .Menu,
+    .Header .Menu > mrbr-ui-menuitem.-hasSubmenu > a:after {
+        color: white;
+        border-color: white;
+    }
+    .Header .Menu mrbr-ui-menuitem mrbr-ui-menu{
+        color: black;
+    }
+    .Header .Menu > mrbr-ui-menuitem:hover > a:first-child,
+    .Header .Menu > mrbr-ui-menuitem.-active > a:first-child {
+        background-color: rgba(255,255,255,0.2);
+    }

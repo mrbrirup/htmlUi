@@ -1,9 +1,9 @@
-html,body{height:100vh;margin:0;padding:0}
+html,body{height:100vh;margin:0;padding:0; overflow:hidden}
 body {
     padding: 0px;
     margin: 0px;
     font-size: var(--default-control-font-size);
-    background-color: white;
+    background-color: var(--default-colour-desktop);
     font-family: var(--default-control-font);
 }
 .Mrbr-UI-Containers-AppContainer:before{

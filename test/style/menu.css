@@ -1,0 +1,203 @@
+/*
+Naming convention:
+Block
+element
+-modifier
+*/
+
+.Menu {
+    display: none;
+    position: relative;
+    box-sizing:border-box;
+    color: var(--default-colour-menu-text);
+}
+mrbr-ui-menu.Menu.-horizontal {
+    display:flex;
+    flex-direction: row;
+}
+mrbr-ui-menu.Menu.-horizontal > mrbr-ui-menuitem > mrbr-ui-menu {
+    flex-direction: column;
+    margin-top:18px;
+}
+.Menu * {box-sizing: border-box;}
+    mrbr-ui-menu.Menu.-horizontal,
+    mrbr-ui-menu.Menu.-vertical {
+        box-sizing: border-box;
+    }
+    mrbr-ui-menu.Menu.-floating {
+        display: block;
+        position: absolute;
+    }
+
+    /* Menu and menu-item layout */
+    .Menu,
+    .Menu mrbr-ui-menuitem,
+    .Menu mrbr-ui-menuitem > mrbr-ui-menu {
+        margin: 0px;
+        box-sizing: border-box;
+    }
+    mrbr-ui-menuitem {
+        position: relative;
+        white-space: nowrap;
+        word-break: keep-all;
+        box-sizing: border-box;
+        background-color: var(--default-colour-menu);
+    }
+    .Menu > mrbr-ui-menuitem mrbr-ui-menu  {
+        box-sizing: border-box;
+        border:1px outset var( --default-colour-hilight);
+    }
+    .Menu > mrbr-ui-menuitem > mrbr-ui-menu mrbr-ui-menuitem > a {
+        border-left:var(--default-control-padded-border-width) inset white;
+        background-color: var(--default-colour-menu);
+    }
+    mrbr-ui-menu{
+        box-sizing: border-box;
+        background-color: var(--default-colour-menu);
+    }
+    .Menu mrbr-ui-menuitem > * {
+        position: relative;
+    }
+    .Menu mrbr-ui-menuitem > mrbr-ui-menu {
+        position: absolute;
+        min-width: 100%;
+        top: 0px;
+        left: 100%;
+    }
+    .Menu.-horizontal.-alignRight mrbr-ui-menuitem > mrbr-ui-menu {
+        left: auto;
+        right: 100%;
+    }
+    .Menu.-horizontal.-alignRight > mrbr-ui-menuitem > mrbr-ui-menu {
+        right: 0px;
+    }
+    .Menu.-horizontal > mrbr-ui-menuitem > mrbr-ui-menu {
+        top: auto;
+        left: auto;
+    }
+
+    /* Menu behaviour */
+    .Menu mrbr-ui-menuitem > mrbr-ui-menu,
+    .Menu.-floating {
+        display: none;
+    }
+    .Menu mrbr-ui-menuitem > mrbr-ui-menu.-visible,
+    mrbr-ui-menu.Menu.-floating.-visible {
+        display: block;
+        
+    }
+    .Menu mrbr-ui-menu > mrbr-ui-menuitem > mrbr-ui-menu.-visible{
+    transform: translateY(-1px);
+    }
+    /* Menu animation */
+    .Menu mrbr-ui-menuitem > mrbr-ui-menu,
+    .Menu.-horizontal.-alignRight mrbr-ui-menuitem > mrbr-ui-menu,
+    .Menu.-floating {
+        opacity: 1;
+        transform-origin: left top;
+    }
+    .Menu.-alignRight mrbr-ui-menuitem > mrbr-ui-menu,
+    .Menu.-floating.-alignRight {
+        transform-origin: right top;
+    }
+    .Menu mrbr-ui-menuitem > mrbr-ui-menu.-animating,
+    .Menu.-floating.-animating {
+        opacity: 0 ;
+    }   
+    .Menu.-horizontal > mrbr-ui-menuitem > div:first-child ,
+    .Menu.-horizontal > mrbr-ui-menuitem:not(.-hasSubmenu) > div:last-child{
+        display: none;
+    }
+    .Menu.-horizontal > mrbr-ui-menuitem.-hasSubmenu > div:last-child {
+        /* width: 18px;
+        height: 18px;
+        margin: 0px; */
+        background-image: url("../../src/resources/images/material-design-icons-master/navigation/svg/production/ic_arrow_drop_down_18px.svg");
+        /* background-position: center center;
+        background-repeat: no-repeat;
+        background-size: var(--default-icon-size-0) var(--default-icon-size-0) ; */
+    }    
+    .Menu.-horizontal > mrbr-ui-menuitem > mrbr-ui-menu mrbr-ui-menuitem.-hasSubmenu > div:last-child {
+        /* width: 18px;
+        height: 18px;
+        /*bottom: 4px;
+        right: 0px;*/
+        /*margin: 0px; */
+        /*padding-top:var(--default-control-padding) ;
+        padding-bottom:var(--default-control-padding) ;*/
+        /* background-image: url("../../src/resources/images/material-design-icons-master/navigation/svg/production/ic_arrow_drop_down_18px.svg"); */
+        background-image: url("../../src/resources/images/material-design-icons-master/navigation/svg/production/arrow_right-24px.svg");
+        /* background-position: center center;
+        background-repeat: no-repeat;
+        background-size: var(--default-icon-size-0) var(--default-icon-size-0) ; */
+        margin-left: auto;
+        align-self: flex-end;
+    }    
+    .Menu {
+        height:var(--default-control-toolbar-size);
+    }
+    .Menu.-horizontal,
+    .Menu mrbr-ui-menuitem,
+    .Menu mrbr-ui-menuitem > :first-child {
+        height:var(--default-control-toolbar-size);        
+    }
+    mrbr-ui-menuitem > a{
+        padding:var(--default-control-padding) ;
+    }
+    .Menu *[data-icon]:before,
+    .Menu .Icon {
+        width: var(--default-control-menu-height);
+        height: var(--default-control-menu-height);
+    }
+    .Menu *[data-icon] {
+        min-width: var(--default-control-menu-height);
+        min-height: var(--default-control-menu-height);
+        padding-left:var(--default-control-menu-height);
+    }
+
+    /* Default font settings for menu */
+    .Menu {
+        font-family: var(--default-control-font-name);
+        font-size: var(--default-control-menu-font-size);
+        height:var(--default-control-menu-height);
+    }
+
+    .Menu.-horizontal mrbr-ui-menuitem > mrbr-ui-menu,
+    .Menu.-floating {
+        min-width:var(--default-control-menu-width);
+    }
+
+    /* Animation speed of dropdown menus */
+    .Menu mrbr-ui-menuitem > mrbr-ui-menu,
+    .Menu.-floating {
+        transition: width 0.1s, height 0.1s, transform 0.1s, opacity 0.1s;
+    }
+
+    /* Styling of hyperlink text */
+    .Menu mrbr-ui-menuitem > a {
+        text-decoration: none;
+        color: inherit;
+    }
+    /* Colour of :hover shading */
+    .Menu mrbr-ui-menuitem:hover,
+    .Menu mrbr-ui-menuitem:hover > a,
+    .Menu mrbr-ui-menuitem.-active > a:first-child 
+    {
+        transition: background-color var(--default-control-animation-speed);
+        background-color: var(--default-colour-hilight);
+        color:var(--default-colour-hilight-text);
+    }
+    mrbr-ui-menuitem:hover,mrbr-ui-menuitem > a:hover {        
+        fill: white;
+        stroke: white;
+    }
+    mrbr-ui-menuitem > div {
+        width: var(--default-icon-size-1);
+        height: var(--default-icon-size-1);        
+        background-position: var(--default-control-padding) center; 
+        background-repeat: no-repeat;
+        background-size: var(--default-icon-size-0) var(--default-icon-size-0) ;
+    }
+    mrbr-ui-menu > mrbr-ui-menuitem{
+        display: flex;                
+    }

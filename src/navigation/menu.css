@@ -1,18 +1,26 @@
 mrbr-ui-navigation-menu {
     position: absolute;
     display: none;
+    font-size: var(--default-control-menu-font-size);
 }
 
 mrbr-ui-navigation-menu>nav {
+    background-color: var(--default-colour-menu);
+    color: var(--default-colour-menu-text);
+    visibility:hidden;
     cursor: pointer;
-    font-size: var(--default-control-font-size);
     display: flex;
     box-sizing: border-box;
+    visibility: hidden;
     opacity: 0;
+    transition-property: visibility, opacity;
+    transition-duration: 0.5s, var(--default-control-animation-speed);
+    transition-delay: 0.5s, var(--default-control-animation-speed);
 }
 mrbr-ui-navigation-menu.show {
-    display: block;
+     display: block;
 }
+
 mrbr-ui-navigation-menuitem {
     height: 1.25rem;
 }
@@ -23,12 +31,17 @@ mrbr-ui-navigation-menu * {
 mrbr-ui-navigation-menu>nav>mrbr-ui-navigation-submenu {
     display: flex;
     box-sizing: border-box;
-    border-right: 1px solid transparent;
     padding: 0px;
+    -webkit-box-shadow: 3px 0px 0px 0px rgba(0,0,0,0.43);
+    -moz-box-shadow: 3px 0px 0px 0px rgba(0,0,0,0.43);
+    box-shadow: 3px 0px 0px 0px rgba(0,0,0,0.43);
 }
-mrbr-ui-navigation-menu.show>nav {
-    transition: opacity var(--default-control-animation-speed);
+mrbr-ui-navigation-menu.show>nav.show {
+    visibility: visible;
     opacity: 1;
+    transition-property: visibility, opacity;
+    transition-duration: 0s, var(--default-control-animation-speed);
+    transition-delay: 0s, var(--default-control-animation-speed);
 }
 mrbr-ui-navigation-menu>nav>mrbr-ui-navigation-submenu>mrbr-ui-navigation-menuitem {
     pointer-events: all;
@@ -38,7 +51,7 @@ mrbr-ui-navigation-menu>nav>mrbr-ui-navigation-submenu>mrbr-ui-navigation-menuit
 mrbr-ui-navigation-menu>nav>mrbr-ui-navigation-submenu>mrbr-ui-navigation-menuitem mrbr-ui-navigation-menuitem mrbr-ui-navigation-submenu {
     -webkit-transform: translateX(100%);
     transform: translateX(100%);
-    right: 0;
+    right: 0;    
 }
 mrbr-ui-navigation-menu mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu {
     position: absolute;
@@ -50,12 +63,10 @@ mrbr-ui-navigation-menu mrbr-ui-navigation-menuitem {
     display: block;
     opacity: 0;
     cursor: pointer;
-    font-size: var(--default-control-font-size)
 }
 mrbr-ui-navigation-menu mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu {
     position: absolute;
     pointer-events: none;
-    border-right: 1px solid transparent;
 }
 mrbr-ui-navigation-menu[direction='down'] mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu {
     top: 100%;
@@ -87,8 +98,16 @@ mrbr-ui-navigation-menuitem:hover>mrbr-ui-navigation-submenu {
     opacity: 1;
     pointer-events: initial;
     transition: opacity var(--default-control-animation-speed);
+    -webkit-box-shadow: 3px 0px 0px 0px rgba(0,0,0,0.43);
+    -moz-box-shadow: 3px 0px 0px 0px rgba(0,0,0,0.43);
+    box-shadow: 3px 0px 0px 0px rgba(0,0,0,0.43);
 }
-
+mrbr-ui-navigation-menuitem{
+    height:1.5rem;
+    vertical-align: middle;
+    margin-top:auto;
+    margin-bottom: auto;
+}
 mrbr-ui-navigation-menuitem:hover>mrbr-ui-navigation-submenu>mrbr-ui-navigation-menuitem, mrbr-ui-navigation-submenu:hover>mrbr-ui-navigation-menuitem {
     opacity: 1;
     transition: opacity var(--default-control-animation-speed);
@@ -98,9 +117,9 @@ mrbr-ui-navigation-menu a {
     background: var(--default-control-background-color);
     color: var(--default-control-font-color);
     min-width: 6rem;
-    transition: background var(--default-control-animation-speed), color var(--default-control-animation-speed);    
+    transition: background var(--default-control-animation-speed), color var(--default-control-animation-speed);
     box-sizing: border-box;
-    height: 1.25rem;
+    height: var(--default-control-menu-font-size);
     padding: 0.125rem 0.25rem 0.125rem 1.25rem;
     position: relative;
 }
