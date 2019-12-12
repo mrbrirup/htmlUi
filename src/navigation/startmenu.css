@@ -1,0 +1,34 @@
+:host {
+    display: flex;
+    box-sizing: border-box;
+    
+}
+:host > mrbr-ui-navigation-menu {
+    /*border: var(--default-control-border-width) outset transparent;*/
+}
+:host > mrbr-ui-navigation-menu:hover {
+/*    box-sizing: border-box;
+    border: var(--default-control-border-width) outset var(--default-colour-button-hilight);
+    transition: border-color var(--default-control-animation-speed);*/
+}
+
+:host([navlocation="top"]), :host([navlocation="bottom"]) {
+    height: 100%;
+    width: var(--default-icon-size-3);
+}
+
+:host([navlocation="left"]), :host([navlocation="right"]) {
+    /*height: var(--default-icon-size-0);*/
+    /* height: var(--default-control-menu-height); */
+    height:var(--default-icon-size-3);;
+    width: 100%;
+}
+
+:host>mrbr-ui-navigation-menu {
+    width: 100%;
+    height: 100%;
+    background-image: url("ui/resources/images/svg/navigation/ic_apps_24px.svg");
+    background-size: var(--default-icon-size-2) var(--default-icon-size-2);
+    background-position: center center;
+    background-repeat: no-repeat;
+}

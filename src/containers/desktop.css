@@ -1,7 +1,197 @@
-mrbr-ui-containers-desktop{
-    width:100%;
-    height:100%;    
+:root {
+  --mrbr-ui-containers-desktop-controlbox-size: calc(var(--default-control-toolbar-size) *3);
 }
-.docker-panel-default, .docker-container{
-    background-color: transparent;
+
+html, body {
+  font-size: var(--default-control-font-size);
+  font-family: var(--default-control-font-name);
+  margin: 0px;
+  padding: 0px;
+  overflow: hidden;
+  background-color: var(--default-colour-desktop);
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+}
+
+mrbr-ui-containers-desktop {
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  display: flex;
+  background-color: var(--default-colour-desktop);
+}
+
+mrbr-ui-containers-desktop[navLocation='top'] {
+  flex-direction: column
+}
+
+mrbr-ui-containers-desktop[navLocation='bottom'] {
+  flex-direction: column-reverse
+}
+
+mrbr-ui-containers-desktop[navLocation='left'] {
+  flex-direction: row;
+}
+
+mrbr-ui-containers-desktop[navLocation='right'] {
+  flex-direction: row-reverse
+}
+
+mrbr-ui-containers-desktop>nav {
+  box-sizing: border-box;
+}
+
+mrbr-ui-containers-desktop>.mrbr-ui-containers-desktop-navhost>nav>mrbr-ui-menu {
+  margin: 0px;
+  padding: 0px;
+}
+
+mrbr-ui-containers-desktop>.mrbr-ui-containers-desktop-navhost {
+  box-sizing: border-box;
+  display: flex;
+  background-color: var(--default-control-background-color-alpha);
+}
+
+mrbr-ui-containers-desktop[navLocation='bottom']>.mrbr-ui-containers-desktop-navhost, mrbr-ui-containers-desktop[navLocation='top']>.mrbr-ui-containers-desktop-navhost {
+  height: var(--default-control-toolbar-size);
+  width: 100%;
+  flex-direction: row;
+}
+
+mrbr-ui-containers-desktop>.mrbr-ui-containers-desktop-navhost {
+  display: flex;
+  box-sizing: border-box;
+}
+
+mrbr-ui-containers-desktop[navLocation='left']>.mrbr-ui-containers-desktop-navhost, mrbr-ui-containers-desktop[navLocation='right']>.mrbr-ui-containers-desktop-navhost {
+  width: var(--mrbr-ui-containers-desktop-controlbox-size);
+  height: 100%;
+  flex-direction: column;
+}
+
+mrbr-ui-containers-desktop[navLocation='bottom']>.mrbr-ui-containers-desktop-navhost>nav, mrbr-ui-containers-desktop[navLocation='top']>.mrbr-ui-containers-desktop-navhost>nav {
+  height: var(--default-control-toolbar-size);
+  width: 100%;
+  flex-direction: row;
+}
+
+mrbr-ui-containers-desktop[navLocation='left']>.mrbr-ui-containers-desktop-navhost>nav, mrbr-ui-containers-desktop[navLocation='right']>.mrbr-ui-containers-desktop-navhost>nav {
+  width: var(--mrbr-ui-containers-desktop-controlbox-size);
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+}
+
+mrbr-ui-containers-desktop>.mrbr-ui-containers-desktop-navhost>nav>mrbr-ui-menu {
+  box-sizing: border-box;
+  display: flex;
+}
+
+mrbr-ui-containers-desktop[navLocation='bottom']>.mrbr-ui-containers-desktop-navhost>nav>mrbr-ui-menu, mrbr-ui-containers-desktop[navLocation='top']>.mrbr-ui-containers-desktop-navhost>nav>mrbr-ui-menu {
+  height: var(--default-control-toolbar-size);
+  width: 100%;
+}
+
+mrbr-ui-containers-desktop[navLocation='left']>.mrbr-ui-containers-desktop-navhost>nav>mrbr-ui-menu, mrbr-ui-containers-desktop[navLocation='right']>.mrbr-ui-containers-desktop-navhost>nav>mrbr-ui-menu {
+  width: var(--mrbr-ui-containers-desktop-controlbox-size);
+  height: 100%;
+}
+
+mrbr-ui-containers-desktop>.mrbr-ui-containers-desktop-navhost mrbr-ui-menuitem {
+  background-color: var(--default-colour-menu);
+  color: var(--default-colour-menu-text);
+  box-sizing: border-box;
+}
+
+/*mrbr-ui-containers-desktop > .mrbr-ui-containers-desktop-navhost mrbr-ui-menuitem:hover {
+  box-sizing: border-box;
+  border-width: var(--default-control-border-width);
+  border-style:  solid ;
+  border-color: var(--default-colour-button-hilight);
+  transition: border-color var(--default-control-animation-speed);
+}*/
+
+mrbr-ui-containers-desktop>.mrbr-ui-containers-desktop-navhost>.mrbr-ui-containers-desktop-controlbox {
+  background-color: var(--default-control-background-color);
+  align-self: flex-end;
+  display: flex;
+}
+
+mrbr-ui-containers-desktop[navLocation='bottom']>.mrbr-ui-containers-desktop-navhost>.mrbr-ui-containers-desktop-controlbox, mrbr-ui-containers-desktop[navLocation='top']>.mrbr-ui-containers-desktop-navhost>.mrbr-ui-containers-desktop-controlbox {
+  height: var(--default-control-toolbar-size);
+  flex-direction: row;
+}
+
+mrbr-ui-containers-desktop[navLocation='left']>.mrbr-ui-containers-desktop-navhost>.mrbr-ui-containers-desktop-controlbox, mrbr-ui-containers-desktop[navLocation='right']>.mrbr-ui-containers-desktop-navhost>.mrbr-ui-containers-desktop-controlbox {
+  width: var(--mrbr-ui-containers-desktop-controlbox-size);
+  align-self: self-end;
+  margin-top: auto;
+  flex-direction: column;
+}
+
+.mrbr-ui-containers-desktop-desktop {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  flex: 1;
+}
+
+.mrbr-ui-containers-desktop-navhome {
+  height: var(--default-control-height);
+  background-image: url("resources/images/menu-button-of-three-horizontal-lines.svg");
+  background-size: var(--default-icon-size-0) var(--default-icon-size-0);
+  background-repeat: no-repeat;
+  background-position: center center;
+  box-sizing: border-box;
+  border: var(--default-control-border-width) solid transparent;
+  transition: border-color var(--default-control-animation-speed);
+}
+
+mrbr-ui-containers-desktop[navLocation='left'] .mrbr-ui-containers-desktop-navhome, mrbr-ui-containers-desktop[navLocation='right'] .mrbr-ui-containers-desktop-navhome {
+  width: var(--mrbr-ui-containers-desktop-controlbox-size);
+}
+
+mrbr-ui-containers-desktop[navLocation='top'] .mrbr-ui-containers-desktop-navhome, mrbr-ui-containers-desktop[navLocation='bottom'] .mrbr-ui-containers-desktop-navhome {
+  width: var(--default-control-toolbar-size);
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fadein {
+  -webkit-animation-name: fadein;
+  /* Safari 4.0 - 8.0 */
+  -webkit-animation-duration: var(--default-control-animation-speed);
+  /* Safari 4.0 - 8.0 */
+  animation-name: fadein;
+  animation-duration: var(--default-control-animation-speed);
+  animation-fill-mode: forwards;
+}
+
+.fadeout {
+  -webkit-animation-name: fadeout;
+  /* Safari 4.0 - 8.0 */
+  -webkit-animation-duration: var(--default-control-animation-speed);
+  /* Safari 4.0 - 8.0 */
+  animation-name: fadeout;
+  animation-duration: var(--default-control-animation-speed);
+  animation-fill-mode: forwards;
 }

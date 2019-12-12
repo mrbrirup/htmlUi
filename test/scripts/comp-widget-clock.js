@@ -11,8 +11,10 @@ class widgetclock extends HTMLElement {
     this._initialised = false;
     this._dateField = null;
     this._timeField = null;
+    this._locale = "en-GB";
   }
-
+  get locale(){return this.hasAttribute("locale") ? this.getAttribute('locale') : this._local;}
+  set locale(value){this.setAttribute('locale', value );}
 
   get dateField() {
     return this._dateField;
@@ -44,8 +46,7 @@ class widgetclock extends HTMLElement {
     }
   }
   connectedCallback() {
-
-
+ 
     this.shadowroot.innerHTML = [`<style>`,
       `:host{`,
       `height:var(--default-control-toolbar-size);`,
@@ -101,10 +102,11 @@ class widgetclock extends HTMLElement {
       `<div id="${this.dateId}"></div>`,
       `</div>`
     ].join('');
-    requestAnimationFrame(_ => {
+
+    window.requestAnimationFrame(_ => {
       setTimeout(this.startTime.bind(this), 1);
       setInterval(this.startTime.bind(this), 1000);
-    })
+    });
     if (this.initialised === false) {
       this.dateField = this.shadowroot.getElementById(this.dateId);
       this.timeField = this.shadowroot.getElementById(this.timeId)
@@ -114,12 +116,12 @@ class widgetclock extends HTMLElement {
 
   startTime() {
     const today = new Date(),
-      newTime = today.toLocaleString('en-GB', {
+      newTime = today.toLocaleString(this.locale, {
         hour: 'numeric',
         minute: 'numeric',
         hour12: true
       }),
-      newDate = today.toLocaleDateString("en-GB", {
+      newDate = today.toLocaleDateString(this.locale, {
         dateStyle: "medium"
       });
     if (newDate !== this.dateField.innerHTML) {
@@ -144,4 +146,3 @@ class widgetclock extends HTMLElement {
     // (happens in document.adoptNode, very rarely used)
   }
 }
-window.customElements.define('mrbr-ui-widget-clock', widgetclock);
