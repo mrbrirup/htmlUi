@@ -51,7 +51,7 @@ class extends HTMLElement {
         if (!subMenu) { return; }
         setTimeout(() => {
             subMenu.classList.remove("bottom-right");
-            subMenu.classList.remove("bottom-left");
+            subMenu.classList.remove("left-bottom");
             subMenu.classList.remove("top-right");
             subMenu.classList.remove("right-bottom");
             window.requestAnimationFrame(() => {
@@ -64,7 +64,7 @@ class extends HTMLElement {
                         subMenu.classList.add("right-bottom");
                         break;
                     case "left":
-                        subMenu.classList.add("bottom-left");
+                        subMenu.classList.add("left-bottom");
                         break;
                     case "right":
                         subMenu.classList.add("bottom-right");

@@ -76,13 +76,13 @@ mrbr-ui-navigation-menuitem > div:first-child
     box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.75);
     opacity: 0;
 }
-:host(mrbr-ui-navigation-menu) mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu.-visible {
-    opacity: 1;    
-    transition: var(--default-control-animation-speed) opacity;
-}
 :host(mrbr-ui-navigation-menu) mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu:not(.-visible) {
     opacity: 0;    
     transition: var(--default-control-animation-speed) opacity;
+}
+:host(mrbr-ui-navigation-menu) mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu.-visible {
+    transition: var(--default-control-animation-speed) opacity;
+    opacity: 1;    
 }
 
 .bottom-right {
@@ -102,11 +102,33 @@ mrbr-ui-navigation-menuitem > div:first-child
     top: 100%;
 }
 
-.bottom-left {
+.left-bottom {
     box-sizing: border-box;
     bottom: 0px;
     left: 100%;
 }
+
+.left-top {
+    box-sizing: border-box;
+    top: 0px;
+    left: 100%;
+}
+.top-left {
+    box-sizing: border-box;
+    top: 100%;
+    left: 0px;
+}
+.bottom-left{
+    box-sizing: border-box;
+    bottom: 100%;
+    left: 0px;
+}
+.right-top {
+    box-sizing: border-box;
+    top: 0px;
+    right: 100%;
+}
+
 :host(mrbr-ui-navigation-menu)>mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu mrbr-ui-navigation-menuitem>div {
     width: var(--default-icon-size-1);
     height: var(--default-icon-size-1);

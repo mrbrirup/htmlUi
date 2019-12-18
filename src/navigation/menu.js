@@ -64,6 +64,9 @@ class extends HTMLElement {
             self.active = !self.active;
             self.menu_clicked(event);
         });
+        self.addEventListener("mouseleave",(event)=>{
+            self.hideMenu();
+        });
     }
     menu_clicked(event) {
         const menu = event.target,
@@ -91,8 +94,23 @@ class extends HTMLElement {
             })
         } else {
             subMenu.classList.add("-active");
-            window.requestAnimationFrame(() => {
+            window.setTimeout(()=>{
                 subMenu.classList.add("-visible");
+            },getComputedStyle(document.body).getPropertyValue('--default-control-animation-speed') * 1000);
+        }
+    }
+    hideMenu(event){
+        const self = this,
+         subMenu = this.shadowRoot.querySelector("mrbr-ui-navigation-submenu"),
+            window_getComputedStyle = window.getComputedStyle;
+        if (subMenu.classList.contains("-visible")) {
+            subMenu.classList.remove("-visible");
+            ((fn, last) => fn(fn, last))((fn, last) => {
+                window.requestAnimationFrame(() => {
+                    let opacity = window_getComputedStyle(subMenu).getPropertyValue("opacity");
+                    if (opacity > last) { return; }
+                    (opacity > 0.1) ? fn(fn, opacity) : subMenu.classList.remove("-active");
+                })
             })
         }
     }
