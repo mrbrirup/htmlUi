@@ -3,7 +3,7 @@ class extends HTMLElement {
         super();
         // element created
         this._template = Mrbr.UI.Utils.Utils.template("Mrbr.UI.Navigation.StartMenu");
-        this.shadowroot = this.attachShadow({mode: 'open'});
+        this.shadowroot = this.attachShadow({ mode: 'open' });
     }
     set navlocation(value) {
         this.setAttribute("navlocation", value)
@@ -26,10 +26,10 @@ class extends HTMLElement {
         //return [/* array of attribute names to monitor for changes */];
         return ["navlocation"];
     }
-    attributeChangedCallback(name, oldValue, newValue) {        
-        if(this.shadowRoot && name==="navlocation"){
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (this.shadowRoot && name === "navlocation") {
             let childMenu = this.shadowRoot.querySelector("mrbr-ui-navigation-menu")
-            if(childMenu){childMenu.setAttribute("navlocation",newValue);}
+            if (childMenu) { childMenu.setAttribute("navlocation", newValue); }
         }
         const self = this;
         if (!self.shadowRoot) { return; }
