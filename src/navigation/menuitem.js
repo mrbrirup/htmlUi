@@ -63,6 +63,16 @@ class extends HTMLElement {
                 self.dispatchEvent(Mrbr.UI.Navigation.Menu_Click_EventArgs.create(self));
                 event.preventDefault()
             })
+            self.addEventListener("mouseenter", (event) => {
+                self.dispatchEvent(Mrbr.UI.Navigation.Menu_Click_EventArgs.create(self, "menuitem_enter"));
+                event.preventDefault()
+            })
+            self.addEventListener("mouseleave", (event) => {
+                self.dispatchEvent(Mrbr.UI.Navigation.Menu_Click_EventArgs.create(self,"menuitem_leave"));
+                event.preventDefault()
+                //self.style.backgroundColor = "transparent";
+            })
+
         })
     }
     disconnectedCallback() {

@@ -64,6 +64,35 @@ class extends HTMLElement {
             self.active = !self.active;
             self.menu_clicked(event);
         });
+        self.shadowRoot.addEventListener("menuitem_enter", (event) => {
+            event.detail.source.classList.add("green")
+            const sm = event.detail.source.querySelector("mrbr-ui-navigation-submenu");            
+            if(sm && sm.parentNode === event.detail.source && event.detail.source.parentNode && event.detail.source.parentNode.tagName  && event.detail.source.parentNode.tagName.toLowerCase() !== "mrbr-ui-navigation-menu"){
+                console.log(sm)
+                self.menuParent_clicked(event.detail.source)
+            }
+        });
+        self.shadowRoot.addEventListener("menuitem_leave", (event) => {
+            const subMenu = event.detail.source.querySelector("mrbr-ui-navigation-submenu");            
+            if(subMenu && subMenu.parentNode === event.detail.source && event.detail.source.parentNode && event.detail.source.parentNode.tagName && event.detail.source.parentNode.tagName.toLowerCase() !== "mrbr-ui-navigation-menu" ){
+                self.menuParent_clicked(event.detail.source)
+                const window_getComputedStyle = window.getComputedStyle;
+                ((fn, last) => fn(fn, last))((fn, last) => {
+                    window.requestAnimationFrame(() => {
+                        let opacity = window_getComputedStyle(subMenu).getPropertyValue("opacity");
+                        if (opacity > last) { return; }
+                        //(opacity > 0.1) ? fn(fn, opacity) : event.detail.source.classList.remove("green");;
+                        (opacity > 0.1) ? fn(fn, opacity) : event.detail.source.querySelectorAll(".green").forEach(node=>node.classList.remove("green"));
+                    })
+                })
+                //window.requestAnimationFrame(()=>{
+                    
+                //});
+            }else{
+                event.detail.source.classList.remove("green")
+
+            }
+        });
         self.addEventListener("mouseleave",(event)=>{
             self.hideMenu();
         });

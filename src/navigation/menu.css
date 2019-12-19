@@ -21,15 +21,16 @@
     font-family: var(--default-control-font-name);
     /* padding:var(--default-control-padding) ; */
     font-size: var(--default-control-menu-font-size);
-    background-color: var(--default-colour-menu);
+    /*background-color: var(--default-colour-menu);*/
     ;
 }
-mrbr-ui-navigation-menuitem > div:first-child
-{
-    margin-right:3px;
-    padding-right:3px;
+
+mrbr-ui-navigation-menuitem>div:first-child {
+    margin-right: 3px;
+    padding-right: 3px;
     border-right: var(--default-control-padded-border-width) inset white;
 }
+
 :host(mrbr-ui-navigation-menu)>mrbr-ui-navigation-menuitem {
     display: block;
     box-sizing: border-box;
@@ -37,9 +38,9 @@ mrbr-ui-navigation-menuitem > div:first-child
     height: 100%;
     text-decoration: none;
     color: inherit;
-    font-family: var(--default-control-font-name);   
-    margin-top: auto ;
-    margin-bottom: auto ;
+    font-family: var(--default-control-font-name);
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 :host(mrbr-ui-navigation-menu) mrbr-ui-navigation-menuitem>a {
@@ -48,15 +49,16 @@ mrbr-ui-navigation-menuitem > div:first-child
     font-family: var(--default-control-font-name);
     font-size: var(--default-control-menu-font-size);
     box-sizing: border-box;
-     padding-left: var( --default-control-padded-border-width);
-    vertical-align:middle;    
+    padding-left: var( --default-control-padded-border-width);
+    vertical-align: middle;
 }
 
 :host(mrbr-ui-navigation-menu)>mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu>mrbr-ui-navigation-menuitem>a {
-    background-color: var(--default-colour-menu);    
-    margin-top: auto ;
-    margin-bottom: auto ;
+    /* background-color: var(--default-colour-menu); */
+    margin-top: auto;
+    margin-bottom: auto;
 }
+
 :host(mrbr-ui-navigation-menu) mrbr-ui-navigation-submenu {
     box-sizing: border-box;
     background-color: var(--default-colour-menu);
@@ -71,18 +73,20 @@ mrbr-ui-navigation-menuitem > div:first-child
     display: flex;
     position: absolute;
     flex-direction: column;
-    -webkit-box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.75);
-    -moz-box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.75);
-    box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.75);
+    /* -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75); */
     opacity: 0;
 }
+
 :host(mrbr-ui-navigation-menu) mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu:not(.-visible) {
-    opacity: 0;    
+    opacity: 0;
     transition: var(--default-control-animation-speed) opacity;
 }
+
 :host(mrbr-ui-navigation-menu) mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu.-visible {
     transition: var(--default-control-animation-speed) opacity;
-    opacity: 1;    
+    opacity: 1;
 }
 
 .bottom-right {
@@ -90,6 +94,7 @@ mrbr-ui-navigation-menuitem > div:first-child
     bottom: 0px;
     right: 100%;
 }
+
 .right-bottom {
     box-sizing: border-box;
     bottom: 100%;
@@ -113,16 +118,23 @@ mrbr-ui-navigation-menuitem > div:first-child
     top: 0px;
     left: 100%;
 }
+
 .top-left {
     box-sizing: border-box;
     top: 100%;
     left: 0px;
 }
-.bottom-left{
+
+.bottom-left {
     box-sizing: border-box;
     bottom: 100%;
     left: 0px;
 }
+
+.bottom-left mrbr-ui-navigation-submenu {
+    left: 100%;
+}
+
 .right-top {
     box-sizing: border-box;
     top: 0px;
@@ -147,4 +159,24 @@ mrbr-ui-navigation-menuitem > div:first-child
 
 :host(mrbr-ui-navigation-menu)>mrbr-ui-navigation-menuitem>mrbr-ui-navigation-submenu mrbr-ui-navigation-menuitem[type='header']>div {
     display: none;
+}
+
+.green:hover {
+    /*transition: var(--default-control-animation-speed) opacity;
+    opacity: 1;
+    background-color: green;
+    display: flex;
+    position: absolute;
+    flex-direction: column;*/
+    -webkit-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.75);
+    /*opacity: 0;*/
+}
+
+.top-left .green>mrbr-ui-navigation-submenu, .left-top .green>mrbr-ui-navigation-submenu{
+    left:100%;
+}
+.right-top .green>mrbr-ui-navigation-submenu{
+    right:100%;
 }
