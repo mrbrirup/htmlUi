@@ -13,22 +13,29 @@
     flex-direction: column;
     text-align: center;
     background-color: var(--default-control-background-color);
-    border: var(--default-control-border-width) outset transparent;
-    transition: border-color var(--default-control-animation-speed);
+    /* border: var(--default-control-border-width) outset transparent;
+    transition: border-color var(--default-control-animation-speed); */
+    height:100%;
 }
 
 :host([navlocation='top']) .clockparent, :host([navlocation='bottom']) .clockparent {
     flex-direction: row;
     width: auto;
-    height: var(--default-control-toolbar-size);
-    padding: var(--default-control-padding);
+    /* height: var(--default-control-toolbar-size);
+    padding: var(--default-control-padding); */
+    padding-left: var(--default-control-padding);
+    padding-right: var(--default-control-padding);
+    margin-top:auto;
+    margin-bottom:auto;
 }
 
 :host([navlocation='top']) .clockparent>div, :host([navlocation='bottom']) .clockparent>div {
-    height: 1rem;
+    /*height: 1rem;*/
     width: auto;
     white-space: nowrap;
     box-sizing: border-box;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 :host([navlocation='top']) .clockparent>div:first-child, :host([navlocation='bottom']) .clockparent>div:first-child {
@@ -48,9 +55,4 @@
     box-sizing: border-box;
     overflow: hidden;
     text-align: center;
-}
-
-:host .clockparent:hover {
-    border: var(--default-control-border-width) outset var(--default-colour-button-hilight);
-    transition: border-color var(--default-control-animation-speed);
 }

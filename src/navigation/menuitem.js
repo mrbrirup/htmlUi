@@ -14,10 +14,10 @@ class extends HTMLElement {
 
 
     }
-    get group(){return this.getAttribute('group');}
-    set group(value){this.setAttribute('group', value );}
-    get data(){return this._data;}
-    set data(value){this._data = value;}
+    get group() { return this.getAttribute('group'); }
+    set group(value) { this.setAttribute('group', value); }
+    get data() { return this._data; }
+    set data(value) { this._data = value; }
     get menuid() { return this.getAttribute('menuid'); }
     set menuid(value) { this.setAttribute('menuid', value); }
     get icon() { return this.getAttribute('icon'); }
@@ -44,23 +44,26 @@ class extends HTMLElement {
         }
     }
     connectedCallback() {
-        this.id = "ctrl_" + new Date().getTime().toString() + Math.random().toString().replace('.', '');
-        const text = this.text;
-        this.childNodes.forEach(node => { if (node.tagName && node.tagName.toLowerCase() === "mrbr-ui-menu" && !(node.classList.contains("-hasSubmenu"))) { this.classList.add("-hasSubmenu") } });
-        const div = document.createElement("div");
-        if(this.icon !== null){div.style.backgroundImage = `url(${this.icon})`; }
-        const a = document.createElement("a"),
-            txt = document.createTextNode(this.text);
-
-        a.appendChild(txt);
-        this.prepend(a);
-        this.prepend(div);
-        const div2 = document.createElement("div");
-        this.appendChild(div2);
-        const self = this;
-        window.requestAnimationFrame(() => {
+        const self = this,
+            text = self.text,
+            div = document.createElement("div"),
+            a = document.createElement("a"),
+            txt = document.createTextNode(this.text),
+            div2 = document.createElement("div");
+            self.id = "ctrl_" + new Date().getTime().toString() + Math.random().toString().replace('.', '');
+            if (self.icon !== null) { div.style.backgroundImage = `url(${self.icon})`; }
+            a.appendChild(txt);
+            self.prepend(a);
+            self.prepend(div);
+            self.appendChild(div2);
+            window.requestAnimationFrame(() => {                
+                if(self.querySelector("mrbr-ui-navigation-submenu")){
+                   div2.classList.add("subMenu")
+                }
             self.addEventListener("click", (event) => {
-                self.dispatchEvent(Mrbr.UI.Navigation.Menu_Click_EventArgs.create(self));
+                if (self.querySelector("mrbr-ui-navigation-submenu") !== null || self.parentNode.tagName !== null) {
+                    self.dispatchEvent(Mrbr.UI.Navigation.Menu_Click_EventArgs.create(self));
+                }
                 event.preventDefault()
             })
             self.addEventListener("mouseenter", (event) => {
@@ -68,11 +71,9 @@ class extends HTMLElement {
                 event.preventDefault()
             })
             self.addEventListener("mouseleave", (event) => {
-                self.dispatchEvent(Mrbr.UI.Navigation.Menu_Click_EventArgs.create(self,"menuitem_leave"));
+                self.dispatchEvent(Mrbr.UI.Navigation.Menu_Click_EventArgs.create(self, "menuitem_leave"));
                 event.preventDefault()
-                //self.style.backgroundColor = "transparent";
             })
-
         })
     }
     disconnectedCallback() {

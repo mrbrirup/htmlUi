@@ -1,5 +1,5 @@
 :root {
-  --mrbr-ui-containers-desktop-controlbox-size: calc(var(--default-control-toolbar-size) *3);
+  --mrbr-ui-containers-desktop-controlbox-size: calc(var(--default-control-toolbar-size) *2.5);
 }
 
 html, body {
