@@ -58,7 +58,9 @@ class extends HTMLElement {
             self.appendChild(div2);
             window.requestAnimationFrame(() => {                
                 if(self.querySelector("mrbr-ui-navigation-submenu")){
-                   div2.classList.add("subMenu")
+                    if(!div2.classList.contains("mrbr-ui-navigation-submenu")){
+                        div2.classList.add("mrbr-ui-navigation-submenu");
+                    }
                 }
             self.addEventListener("click", (event) => {
                 if (self.querySelector("mrbr-ui-navigation-submenu") !== null || self.parentNode.tagName !== null) {

@@ -1,7 +1,16 @@
 class extends HTMLElement {
     static get manifest() {
-        const componentManifest = Mrbr.UI.Utils.Utils.componentManifest;
-        return componentManifest("Mrbr.UI.Widgets.Clock", true, true).concat(componentManifest("Mrbr.UI.Widgets.TaskbarSettings", true, true)).concat(componentManifest("Mrbr.UI.Navigation.Menu", true, false)).concat(componentManifest("Mrbr.UI.Navigation.StartMenu", true, true))
+        const componentManifest = Mrbr.UI.Utils.Utils.componentManifest,
+            entry = Mrbr.System.ManifestEntry;
+
+
+        return componentManifest("Mrbr.UI.Widgets.Clock", true, true)
+            .concat(componentManifest("Mrbr.UI.Widgets.TaskbarSettings", true, true))
+            .concat(componentManifest("Mrbr.UI.Navigation.Menu", true, false))
+            .concat(componentManifest("Mrbr.UI.Navigation.StartMenu", true, true))
+            .concat(componentManifest("Mrbr.UI.Dialogs.Dialog", false, false))
+            .concat()
+            .concat([new entry(entry.FileTypes.Style, "Mrbr.UI.Dialogs.Dialog")]);
     }
     constructor(config) {
         super();
@@ -86,13 +95,13 @@ class extends HTMLElement {
             this.startMenu = document.getElementById(this.menuMenuId);
             this.initialised = true;
             this.setChildPositions(this.navlocation);
-            this.addEventListener("navlocation", (event)=>{
-                if(self.navlocation !== event.detail.position){
+            this.addEventListener("navlocation", (event) => {
+                if (self.navlocation !== event.detail.position) {
                     self.classList.remove("fadein");
                     self.classList.add("fadeout");
                     setTimeout(() => {
-                        self.navlocation= event.detail.position;
-                    },parseFloat(getComputedStyle(document.body).getPropertyValue('--default-control-animation-speed')) * 1000)
+                        self.navlocation = event.detail.position;
+                    }, parseFloat(getComputedStyle(document.body).getPropertyValue('--default-control-animation-speed')) * 1000)
                 }
             })
         }
@@ -106,7 +115,7 @@ class extends HTMLElement {
     }
     setChildPositions(position) {
         const self = this,
-        ctrlBox = document.getElementById(self.menuControlBoxId);
+            ctrlBox = document.getElementById(self.menuControlBoxId);
         if (this.childNodes && self.childNodes.length > 0) {
             this.childNodes.forEach(node => {
                 if (node.setAttribute) { node.setAttribute("navlocation", position) };
@@ -131,12 +140,12 @@ class extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         const self = this;
         if (name === "navlocation" && this.initialised === true) {
-            self.setChildPositions(newValue);                                
+            self.setChildPositions(newValue);
             setTimeout(() => {
-                window.requestAnimationFrame(()=>{                    
+                window.requestAnimationFrame(() => {
                     self.classList.add("fadein");
                     self.classList.remove("fadeout");
-                }) 
+                })
             }, parseFloat(getComputedStyle(document.body).getPropertyValue('--default-control-animation-speed')) * 1000);
         }
         ;

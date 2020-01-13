@@ -36,24 +36,24 @@ class extends HTMLElement {
         const subMenu = self.shadowRoot.querySelector("mrbr-ui-navigation-menu").shadowRoot.querySelector("mrbr-ui-navigation-menuitem > mrbr-ui-navigation-submenu");
         if (!subMenu) { return; }
         setTimeout(() => {
-            subMenu.classList.remove("bottom-left");
-            subMenu.classList.remove("left-top");
-            subMenu.classList.remove("right-top");
-            subMenu.classList.remove("top-left");
+            subMenu.classList.remove("mrbr-ui-navigation-menu-bottom-left");
+            subMenu.classList.remove("mrbr-ui-navigation-menu-left-top");
+            subMenu.classList.remove("mrbr-ui-navigation-menu-right-top");
+            subMenu.classList.remove("mrbr-ui-navigation-menu-top-left");
             window.requestAnimationFrame(() => {
 
                 switch (newValue) {
                     case "top":
-                        subMenu.classList.add("top-left");
+                        subMenu.classList.add("mrbr-ui-navigation-menu-top-left");
                         break;
                     case "bottom":
-                        subMenu.classList.add("bottom-left");
+                        subMenu.classList.add("mrbr-ui-navigation-menu-bottom-left");
                         break;
                     case "left":
-                        subMenu.classList.add("left-top");
+                        subMenu.classList.add("mrbr-ui-navigation-menu-left-top");
                         break;
                     case "right":
-                        subMenu.classList.add("right-top");
+                        subMenu.classList.add("mrbr-ui-navigation-menu-right-top");
                         break;
                 }
             })

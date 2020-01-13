@@ -65,7 +65,7 @@ class extends HTMLElement {
             self.menu_clicked(event);
         });
         self.shadowRoot.addEventListener("menuitem_enter", (event) => {
-            event.detail.source.classList.add("green")
+            event.detail.source.classList.add("mrbr-ui-navigation-menu-menuenter")
             const sm = event.detail.source.querySelector("mrbr-ui-navigation-submenu");
             if (sm && sm.parentNode === event.detail.source && event.detail.source.parentNode && event.detail.source.parentNode.tagName && event.detail.source.parentNode.tagName.toLowerCase() !== "mrbr-ui-navigation-menu") {
                 self.menuParent_clicked(event.detail.source)
@@ -80,15 +80,12 @@ class extends HTMLElement {
                     window.requestAnimationFrame(() => {
                         let opacity = window_getComputedStyle(subMenu).getPropertyValue("opacity");
                         if (opacity > last) { return; }
-                        //(opacity > 0.1) ? fn(fn, opacity) : event.detail.source.classList.remove("green");;
-                        (opacity > 0.1) ? fn(fn, opacity) : event.detail.source.querySelectorAll(".green").forEach(node => node.classList.remove("green"));
+                        //(opacity > 0.1) ? fn(fn, opacity) : event.detail.source.classList.remove("mrbr-ui-navigation-menu-menuenter");;
+                        (opacity > 0.1) ? fn(fn, opacity) : event.detail.source.querySelectorAll(".mrbr-ui-navigation-menu-menuenter").forEach(node => node.classList.remove("mrbr-ui-navigation-menu-menuenter"));
                     })
                 })
-                //window.requestAnimationFrame(()=>{
-
-                //});
             } else {
-                event.detail.source.classList.remove("green")
+                event.detail.source.classList.remove("mrbr-ui-navigation-menu-menuenter")
 
             }
         });
@@ -117,13 +114,13 @@ class extends HTMLElement {
                 window.requestAnimationFrame(() => {
                     let opacity = window_getComputedStyle(subMenu).getPropertyValue("opacity");
                     if (opacity > last) { return; }
-                    (opacity > 0.1) ? fn(fn, opacity) : subMenu.classList.remove("-active");
+                    (opacity > 0.1) ? fn(fn, opacity) : subMenu.classList.remove("mrbr-ui-navigation-menu-active");
                 })
             })
         } else {
-            subMenu.classList.add("-active");
+            subMenu.classList.add("mrbr-ui-navigation-menu-active");
             window.setTimeout(() => {
-                subMenu.classList.add("-visible");
+                subMenu.classList.add("mrbr-ui-navigation-menu-visible");
             }, getComputedStyle(document.body).getPropertyValue('--default-control-animation-speed') * 1000);
         }
     }
@@ -131,15 +128,15 @@ class extends HTMLElement {
         const self = this,
             subMenu = self.shadowRoot.querySelector("mrbr-ui-navigation-submenu"),
             window_getComputedStyle = window.getComputedStyle;
-        if (subMenu.classList.contains("-visible")) {
-            subMenu.classList.remove("-visible");
+        if (subMenu.classList.contains("mrbr-ui-navigation-menu-visible")) {
+            subMenu.classList.remove("mrbr-ui-navigation-menu-visible");
         }
         ((fn, last) => fn(fn, last))((fn, last) => {
             window.requestAnimationFrame(() => {
                 let opacity = window_getComputedStyle(subMenu).getPropertyValue("opacity");
                 if (opacity > last) {
                     // subMenu.classList.remove("-active");
-                    // self.shadowRoot.querySelectorAll(".green").forEach(_ => { _.classList.remove("green") });
+                    // self.shadowRoot.querySelectorAll(".mrbr-ui-navigation-menu-menuenter").forEach(_ => { _.classList.remove("mrbr-ui-navigation-menu-menuenter") });
                     // self.shadowRoot.querySelectorAll(".-active").forEach(_ => { _.classList.remove("-active") });
                     // self.shadowRoot.querySelectorAll(".-visible").forEach(_ => { _.classList.remove("-visible") });
                     self.clearActiveMenu(subMenu);
@@ -150,7 +147,7 @@ class extends HTMLElement {
                     // console.log("1", opacity);
                     // subMenu.classList.remove("-active");
                     // console.log("2", opacity);
-                    // self.shadowRoot.querySelectorAll(".green").forEach(_ => { console.log(_); _.classList.remove("green") });
+                    // self.shadowRoot.querySelectorAll(".mrbr-ui-navigation-menu-menuenter").forEach(_ => { console.log(_); _.classList.remove("mrbr-ui-navigation-menu-menuenter") });
                     // self.shadowRoot.querySelectorAll(".-active").forEach(_ => { console.log(_); _.classList.remove("-active") });
                     // self.shadowRoot.querySelectorAll(".-visible").forEach(_ => { console.log(_); _.classList.remove("-visible") });
                     self.clearActiveMenu();
@@ -165,9 +162,9 @@ class extends HTMLElement {
         let menuClassList = menu.classList;
         if (menuClassList && menu.tagName.toLowerCase().indexOf("mrbr-ui-navigation") >=0 ){
             window.requestAnimationFrame(()=>{
-                menuClassList.remove("green") ;
-                menuClassList.remove("-active");
-                menuClassList.remove("-visible");
+                menuClassList.remove("mrbr-ui-navigation-menu-menuenter") ;
+                menuClassList.remove("mrbr-ui-navigation-menu-active");
+                menuClassList.remove("mrbr-ui-navigation-menu-visible");
             })
         }
         menu.childNodes.forEach(child =>self.clearActiveMenu(child)  );

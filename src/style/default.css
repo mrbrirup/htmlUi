@@ -3,6 +3,7 @@
     --default-control-padding: 0.25rem;
     --default-size: 12;
     --default-control-height: calc(var(--default-size) * 1.5px);
+    --default-control-width: calc(var(--default-size) * 1.5px);
     --default-control-font-name: Arial, Helvetica Neue, Helvetica, sans-serif;
     --default-control-font-size: calc(var(--default-size) * 1px);
     --default-control-font-color: white;
@@ -10,14 +11,17 @@
     --default-control-background-color-alpha: rgba(64, 64, 64, .43);
     --default-control-resize-bar-size: 0.0rem;
     --default-control-toolbar-size: 2rem;
-    --default-control-border: .125rem black solid;
+    --default-control-border-width: 0.125rem;
+    --default-control-border-color:  black;
+    --default-control-border-style: solid;
     --default-icon-size-0: 1rem;
     --default-icon-size-1: 1.5rem;
     --default-icon-size-2: 2rem;
     --default-icon-size-3: 3rem;
     --default-control-animation-speed: 0.25s;
     --default-control-applied-dpi: 1;
-    --default-control-border-width: .063rem;
+    --default-icon-fill:white;
+    --default-icon-stroke:white;
     --default-control-caption-font-name: var(--default-control-font-name);
     --default-control-caption-font-size: .75rem;
     --default-control-caption-height: 2rem;
@@ -47,7 +51,7 @@
     --default-colour-active-border: rgb(212, 208, 200);
     --default-colour-active-title: rgb(10, 36, 106);
     --default-colour-active-title-text: rgb(255, 255, 255);
-    --default-colour-app-workSpace: rgb(128, 128, 128);
+    --default-colour-app-workspace: rgb(128, 128, 128);
     --default-colour-button-alternate-face: rgb(181, 181, 181);
     --default-colour-button-dk-shadow: rgb(64, 64, 64);
     --default-colour-button-face: rgb(212, 208, 200);

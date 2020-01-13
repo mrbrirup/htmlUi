@@ -50,24 +50,24 @@ class extends HTMLElement {
         const subMenu = self.shadowRoot.querySelector("mrbr-ui-navigation-menu").shadowRoot.querySelector("mrbr-ui-navigation-menuitem > mrbr-ui-navigation-submenu");
         if (!subMenu) { return; }
         setTimeout(() => {
-            subMenu.classList.remove("bottom-right");
-            subMenu.classList.remove("left-bottom");
-            subMenu.classList.remove("top-right");
-            subMenu.classList.remove("right-bottom");
+            subMenu.classList.remove("mrbr-ui-navigation-menu-bottom-right");
+            subMenu.classList.remove("mrbr-ui-navigation-menu-left-bottom");
+            subMenu.classList.remove("mrbr-ui-navigation-menu-top-right");
+            subMenu.classList.remove("mrbr-ui-navigation-menu-right-bottom");
             window.requestAnimationFrame(() => {
 
                 switch (newValue) {
                     case "top":
-                        subMenu.classList.add("top-right");
+                        subMenu.classList.add("mrbr-ui-navigation-menu-top-right");
                         break;
                     case "bottom":
-                        subMenu.classList.add("right-bottom");
+                        subMenu.classList.add("mrbr-ui-navigation-menu-bottom-right");
                         break;
                     case "left":
-                        subMenu.classList.add("left-bottom");
+                        subMenu.classList.add("mrbr-ui-navigation-menu-left-bottom");
                         break;
                     case "right":
-                        subMenu.classList.add("bottom-right");
+                        subMenu.classList.add("mrbr-ui-navigation-menu-right-bottom");
                         break;
                 }
             })
