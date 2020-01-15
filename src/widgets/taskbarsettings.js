@@ -36,6 +36,10 @@ class extends HTMLElement {
                 event.preventDefault();
             })
         })
+        self.addEventListener("click", event=> self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", {bubbles: true, composed: true, detail: {source:self}})));
+        self.dispatchEvent(new CustomEvent("mrbr-control-layer-register", {bubbles: true, composed: true, detail: {source:self}}));
+		//self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", {bubbles: true, composed: true, detail: {source:self}}));
+
     }
     disconnectedCallback() {
         // browser calls this method when the element is removed from the document

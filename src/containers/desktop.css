@@ -196,3 +196,7 @@ mrbr-ui-containers-desktop[navLocation='top'] .mrbr-ui-containers-desktop-navhom
   animation-duration: var(--default-control-animation-speed);
   animation-fill-mode: forwards;
 }
+.mrbr-ui-containers-desktop-navhost > nav {
+  display:flex;
+  flex-direction: inherit;
+}

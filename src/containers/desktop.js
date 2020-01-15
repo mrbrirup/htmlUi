@@ -25,6 +25,7 @@ class extends HTMLElement {
         this._template = utils.template("Mrbr.UI.Containers.Desktop", ["{{mrbr:menuControlBoxId}}", "{{mrbr:navlocation}}", "{{mrbr:desktopId}}", "{{mrbr:menuMenuId}}"], [this.menuControlBoxId, this.navlocation, this.desktopId, this.menuMenuId]);
         this._initialised = false;
         var self = this;
+        this._layers = [];
         this.addEventListener("menu-host", function (event) {
             event.detail.callback(self.desktop);
             event.stopPropagation()
@@ -101,8 +102,15 @@ class extends HTMLElement {
                     self.classList.add("fadeout");
                     setTimeout(() => {
                         self.navlocation = event.detail.position;
+                        self.dispatchEvent(new CustomEvent("mrbr-ui-desktop-navlocation-change",{detail: self.navlocation}) )
                     }, parseFloat(getComputedStyle(document.body).getPropertyValue('--default-control-animation-speed')) * 1000)
                 }
+            })
+            self.addEventListener("mrbr-control-layer-focused", self.layerFocused.bind(self));
+            self.addEventListener("mrbr-control-layer-register", self.layerRegister.bind(self));
+            self.addEventListener("mrbr-control-layer-unregister", self.layerUnregister.bind(self));
+            window.requestAnimationFrame(()=>{
+                self.dispatchEvent(new CustomEvent("mrbr-ui-desktop-navlocation-change",{detail: self.navlocation}) )
             })
         }
     }
@@ -153,5 +161,37 @@ class extends HTMLElement {
     adoptedCallback() {
         // called when the element is moved to a new document
         // (happens in document.adoptNode, very rarely used)
+    }
+    get layers() { return this._layers }
+    set layers(value) { this._layers = value; }
+    layerFocused(event) {
+        //event.detail.source.style.zIndex = 100;
+ //       debugger
+        this.relayer(event.detail.source);
+    }
+    layerRegister(event) {
+   //     debugger
+   const self = this;
+        const target = event.detail.source;
+        this.layers.push(target)
+        let targetStyleZIndex = target.style.zIndex
+        if(targetStyleZIndex === "" || !targetStyleZIndex){
+            target.style.zIndex = self.layers.length * 10;
+            //target.style.zIndex = target.style.zIndex ? target.style.zIndex : 0;
+        }
+    }
+    layerUnregister(event) {
+        const target = event.detail.source;
+        //delete this.layers[target];
+    }
+    relayer(target) {
+        const self = this;
+        let keysSorted = self.layers.sort(function (a, b) { 
+            return parseInt(a.style.zIndex) - parseInt(b.style.zIndex);
+        })
+        for (let layerCounter = 0; layerCounter < self.layers.length; layerCounter++) {            
+                keysSorted[layerCounter].style.zIndex = layerCounter * 10;                        
+        }
+        target.style.zIndex = self.layers.length * 10+1;
     }
 }

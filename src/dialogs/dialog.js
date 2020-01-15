@@ -20,16 +20,24 @@ class extends HTMLElement {
 		this._isResize = false;
 		this._resizeMode = '';
 		this._buttons;
-		this._zIndex; 
-		this._zIndexFlag = false; 
-		this._setDialogContent; 
+		// this._zIndex;
+		// this._zIndexFlag = false;
+		this._setDialogContent;
 		this.controlboxButtons = [];
-		this._container = document.body;
-		this.taskbarContainer = document.body;
+		this._container = null;
+		this._taskbarContainer = null;
 		this._closing = [];
 	}
-	get container (){return this._container}
-	set container (value){ this._container = value; }
+	get taskbarContainer() { return this._taskbarContainer }
+	set taskbarContainer(value) {
+		const this_taskbarContainer = this._taskbarContainer;
+		this._taskbarContainer = value;
+		if (!this_taskbarContainer) {
+			this.createTaskBar();
+		}
+	}
+	get container() { return this._container }
+	set container(value) { this._container = value; }
 	static get EVENTS() {
 		return {
 			minimised: "mrbr-ui-dialogs-events-minimised",
@@ -132,9 +140,9 @@ class extends HTMLElement {
 	}
 	connectedCallback() {
 		const self = this;
-		self.innerHTML = `	<div class="titlebar">
+		self.innerHTML = `	<div class="mrbr-ui-dialogs-titlebar">
 		<div class="mrbr-ui-dialogs-controlbox-left">
-			<div class="icon"></div>
+			<div class="mrbr-ui-dialogs-icon"></div>
 		</div>
 		<div class="mrbr-ui-dialogs-controlbox-centre">
 		<div>Hello</div>
@@ -145,16 +153,16 @@ class extends HTMLElement {
 			<button name="mrbr-ui-dialogs-controlbox-close"></button>
 		</div>
 		</div>
-		<div class="content">
-			<div class="contentcontainer">
+		<div class="mrbr-ui-dialogs-content">
+			<div class="mrbr-ui-dialogs-contentcontainer">
 				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
 			</div>
 		</div>
-		<div class="buttonpane">
-			<div class="buttonset">
+		<div class="mrbr-ui-dialogs-buttonbar">
+			<div class="mrbr-ui-dialogs-buttonset">
 				<button name="ok">OK</button>
 				<button name="cancel">Cancel</button>
 			</div>
@@ -162,9 +170,10 @@ class extends HTMLElement {
 		self._init();
 	}
 	maxSize() {
+
 		const self = this,
 			rect = self._getOffset(self),
-			container = self.container;
+			container = self.container || document.body;
 		let arrMaxX = [
 			container.scrollWidth,
 			container.offsetWidth
@@ -188,13 +197,17 @@ class extends HTMLElement {
 				])
 		}
 		self._maxX = Math.max.apply(null, arrMaxX)
-		self._maxY = Math.max.apply(null, arrMaxY) - parseFloat(self.taskbar.clientHeight) - parseFloat(window.getComputedStyle(self).getPropertyValue("--default-control-border-width"));
-
+		const considerSelfTaskbarSize = self.taskbar.parentElement === self.parentElement;
+		self._maxY = Math.max.apply(null, arrMaxY) - (considerSelfTaskbarSize ? parseFloat(self.taskbar.clientHeight) : 0) - parseFloat(window.getComputedStyle(self).getPropertyValue("--default-control-border-width"));
+		//self._minX = Math.max(parseFloat(container.clientWidth), parseFloat(container.offsetX), parseFloat(container.style.left))
+		self._minX = Math.max(parseFloat(container.offsetLeft), isNaN(parseFloat(container.offsetX)) ? 0 : parseFloat(container.offsetX), isNaN(parseFloat(container.style.left)) ? 0 : parseFloat(container.style.left))
+		self._minY = Math.max(parseFloat(container.offsetTop), isNaN(parseFloat(container.offsetY)) ? 0 : parseFloat(container.offsetY), isNaN(parseFloat(container.style.top)) ? 0 : parseFloat(container.style.top))
+		//debugger
 		return rect;
 	}
 	_onMouseDown(evt) {
 		const self = this;
-		self._zIndexFlag = true;
+		//self._zIndexFlag = true;
 		if (!(self.isDraggableHeader(evt.target) ||
 			self._dialogContent === evt.target ||
 			self._dialogContent.parentElement === evt.target ||
@@ -469,42 +482,50 @@ class extends HTMLElement {
 	isDragging(evt, borderSize) {
 		const self = this, scrollSize = 32, sizeBuffer = 20,
 			style = self.style;
-		let dx = self._startX - evt.pageX, dy = self._startY - evt.pageY, left = self._leftPos - dx, top = self._topPos - dy, scrollL = Math.max(document.body.scrollLeft, document.documentElement.scrollLeft), scrollT = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
-		if (dx < 0 && left + self._startWidth + borderSize * 2 > self._maxX) { left = self._maxX - (self._startWidth + borderSize * 4 + 2); }
-		else if (dx > 0 && left < 0) { left = 0; }
-		if (dy < 0 && top + self._startHeight + borderSize * 2 > self._maxY) { top = self._maxY - (self._startHeight + borderSize * 4 + 2); }
-		else if (dy > 0 && top < 0) { top = 0; }
-		if (left + self._startWidth + borderSize * 2 > self._maxX) { left = self._maxX - (self._startWidth + borderSize * 4 + 1); }
-		if (top + self._startHeight + borderSize * 2 > self._maxY) { top = self._maxY - (self._startHeight + borderSize * 4 + 1); }
+		let dx = self._startX - evt.pageX ,
+			dy = self._startY - evt.pageY,
+			left = self._leftPos - dx,
+			top = self._topPos - dy,
+			scrollL = Math.max(document.body.scrollLeft, document.documentElement.scrollLeft),
+			scrollT = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+		if (dx < 0 && left + self._startWidth + borderSize * 2 > self._maxX + self._minX  ) { left = self._maxX - (self._startWidth + borderSize * 4 + 2) + self._minX ; }
+		else if (dx > 0 && left < self._minX) { left = self._minX; }
+
+		if (dy < 0 && top + self._startHeight + borderSize * 2 > self._maxY + self._minY) { top = self._maxY - (self._startHeight  + borderSize * 4 + 2); + self._minY }
+		else if (dy > 0 && top < self._minY) { top = self._minY; }
+
+
+		if (left 	+ self._startWidth 	+ borderSize * 2 > self._maxX + self._minX 	) { left 	= self._maxX - (self._startWidth 	+ borderSize * 4 + 1); }
+		if (top 	+ self._startHeight + borderSize * 2 > self._maxY + self._minY	) { top 	= self._maxY - (self._startHeight 	+ borderSize * 4 + 1); }
 		style.left = `${left}px`;
 		style.top = `${top}px`;
-		if (evt.clientY > window.innerHeight - scrollSize) { scrollT += scrollSize; }
-		else if (evt.clientY < scrollSize) { scrollT -= scrollSize; }
-		if (evt.clientX > window.innerWidth - scrollSize) { scrollL += scrollSize; }
-		else if (evt.clientX < scrollSize) { scrollL -= scrollSize; }
-		if (top + self._startHeight == self._maxY) { scrollT = self._maxY - window.innerHeight + sizeBuffer; }
-		else if (top == 0) { scrollT = 0; }
-		if (left + self._startWidth == self._maxX) { scrollL = self._maxX - window.innerWidth + sizeBuffer; }
-		else if (left == 0) { scrollL = 0; }
-		if (self._startHeight > window.innerHeight) {
-			if (evt.clientY < window.innerHeight / 2) { scrollT = 0; }
-			else { scrollT = self._maxY - window.innerHeight + sizeBuffer; }
-		}
-		if (self._startWidth > window.innerWidth) {
-			if (evt.clientX < window.innerWidth / 2) { scrollL = 0; }
-			else { scrollL = self._maxX - window.innerWidth + sizeBuffer; }
-		}
-		window.scrollTo(scrollL, scrollT);
+		// if (evt.clientY > window.innerHeight - scrollSize) { scrollT += scrollSize; }
+		// else if (evt.clientY < scrollSize) { scrollT -= scrollSize; }
+		// if (evt.clientX > window.innerWidth - scrollSize) { scrollL += scrollSize; }
+		// else if (evt.clientX < scrollSize) { scrollL -= scrollSize; }
+		// if (top + self._startHeight == self._maxY) { scrollT = self._maxY - window.innerHeight + sizeBuffer; }
+		// else if (top == 0) { scrollT = 0; }
+		// if (left + self._startWidth == self._maxX) { scrollL = self._maxX - window.innerWidth + sizeBuffer; }
+		// else if (left == 0) { scrollL = 0; }
+		// if (self._startHeight > window.innerHeight) {
+		// 	if (evt.clientY < window.innerHeight / 2) { scrollT = 0; }
+		// 	else { scrollT = self._maxY - window.innerHeight + sizeBuffer; }
+		// }
+		// if (self._startWidth > window.innerWidth) {
+		// 	if (evt.clientX < window.innerWidth / 2) { scrollL = 0; }
+		// 	else { scrollL = self._maxX - window.innerWidth + sizeBuffer; }
+		// }
+		// window.scrollTo(scrollL, scrollT);
 	}
 
 	_onMouseUp(evt) {
 		const self = this;
-		if (self._zIndexFlag) {
-			self.style.zIndex = self._zIndex + 1;
-			self._zIndexFlag = false;
-		} else {
-			self.style.zIndex = self._zIndex;
-		}
+		// if (self._zIndexFlag) {
+		// 	self.style.zIndex = self._zIndex + 1;
+		// 	self._zIndexFlag = false;
+		// } else {
+		// 	self.style.zIndex = self._zIndex;
+		// }
 		if (!(self.isDraggableHeader(evt.target) || evt.target === self._buttons[0] || self._dialogButtonPane === evt.target) && !self._isDrag && self._resizeMode == '')
 			return;
 		document.removeEventListener('mousemove', self._onMouseMove.bind(self));
@@ -579,26 +600,25 @@ class extends HTMLElement {
 	}
 	createTaskBar() {
 		const self = this;
-		if (self.taskbar !== undefined) {
+		if (self.taskbar !== undefined || !self.taskbarContainer) {
 			return;
 		}
 		let taskbar = self.taskbarContainer.querySelector(".mrbr-ui-dialogs-taskbar");
-		console.log(taskbar);
 		if (taskbar !== null) {
 			this.taskbar = taskbar;
+			self.createTaskbarButton();
+			const desktop =  document.getElementsByTagName("mrbr-ui-containers-desktop");
+			if(desktop && desktop[0]){
+				desktop[0].addEventListener("mrbr-ui-desktop-navlocation-change", event=> self.taskbar.setAttribute("navlocation",event.detail ) )
+				
+			}
 			return;
 		}
 		taskbar = document.createElement("div");
 		taskbar.classList.add("mrbr-ui-dialogs-taskbar")
-		taskbar.style.position = "fixed";
-		taskbar.style.bottom = "0px";
-		taskbar.style.height = "var(--default-control-toolbar-size)";
-		taskbar.style.width = "100%"
-		taskbar.style.boxSizing = "border-box";
-		taskbar.style.borderTop = "var(--default-control-border-width) solid black";
 		self.taskbar = taskbar;
 		self.taskbarContainer.appendChild(self.taskbar);
-
+		self.createTaskbarButton()
 	}
 	_init() {
 		const self = this,
@@ -606,11 +626,11 @@ class extends HTMLElement {
 
 		style.visibility = 'hidden';
 		style.display = 'block';
-		self._dialogTitle = self.querySelector('.titlebar');
-		self._dialogContent = self.querySelector('.content');
-		self._dialogButtonPane = self.querySelector('.buttonpane');
+		self._dialogTitle = self.querySelector('.mrbr-ui-dialogs-titlebar');
+		self._dialogContent = self.querySelector('.mrbr-ui-dialogs-content');
+		self._dialogButtonPane = self.querySelector('.mrbr-ui-dialogs-buttonbar');
 		self._buttons = self.querySelectorAll('button');
-		let buttonsetStyle = window.getComputedStyle(self._dialogButtonPane.querySelector('.buttonset')),
+		let buttonsetStyle = window.getComputedStyle(self._dialogButtonPane.querySelector('.mrbr-ui-dialogs-buttonset')),
 			buttonSetStyleWidth = parseFloat(buttonsetStyle.width);
 		let _dialogStyle = window.getComputedStyle(self),
 			_dialogTitleStyle = window.getComputedStyle(self._dialogTitle),
@@ -630,7 +650,7 @@ class extends HTMLElement {
 			+ parseInt(_dialogContentStyle.top)
 			+ (2 * parseInt(_dialogStyle.border))
 			+ parseFloat(_dialogButtonPaneStyleBefore.getPropertyValue("--default-control-height")) * 4
-			+ (self._dialogButtonPane.querySelector('.buttonset').querySelectorAll("*").length > 1 ?
+			+ (self._dialogButtonPane.querySelector('.mrbr-ui-dialogs-buttonset').querySelectorAll("*").length > 1 ?
 				+ parseInt(_dialogButtonPaneStyleBefore.borderBottom)
 				- parseInt(_dialogButtonPaneStyleBefore.top)
 				+ parseInt(_dialogButtonPaneStyle.height)
@@ -653,19 +673,18 @@ class extends HTMLElement {
 
 		self.addEventListener('mousemove', self._onMouseMove.bind(self));
 
-		const controlboxRight = self.querySelector(".titlebar .mrbr-ui-dialogs-controlbox-right");
-		self.setSVGColour(".dialog .titlebar .mrbr-ui-dialogs-controlbox-left .icon");
-		self._zIndex = self.style.zIndex;
+		const controlboxRight = self.querySelector(".mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-right");
+		self.setSVGColour(".dialog .mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-left .mrbr-ui-dialogs-icon");
+		//self._zIndex = self.style.zIndex;
 		self._resizePixel = 2 * ((parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size"))) + parseFloat(_dialogContentStyle.getPropertyValue("--default-control-border-width")));
 		self.wireEvents();
 		self.classList.add("mrbr-ui-dialog-visible");
 		self.createTaskBar();
-		self.createTaskbarButton()
 	}
 	wireEvents() {
 
 		const self = this,
-			controlboxRight = self.querySelector(".titlebar .mrbr-ui-dialogs-controlbox-right");
+			controlboxRight = self.querySelector(".mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-right");
 		if (controlboxRight !== undefined) {
 			[
 				controlboxRight.querySelector("button[name='mrbr-ui-dialogs-controlbox-min']"),
@@ -681,6 +700,12 @@ class extends HTMLElement {
 		self.addEventListener(Mrbr.UI.Dialogs.Dialog.EVENTS.minimised, self.minimised.bind(self));
 		self.addEventListener(Mrbr.UI.Dialogs.Dialog.EVENTS.maximised, self.maximised.bind(self));
 		self.addEventListener(Mrbr.UI.Dialogs.Dialog.EVENTS.closing, self.closing.bind(self));
+		self.addEventListener("mousedown", event => {
+			self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", { bubbles: true, composed: true, detail: { source: self } }));
+		})
+		self.dispatchEvent(new CustomEvent("mrbr-control-layer-register", { bubbles: true, composed: true, detail: { source: self } }));
+		self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", { bubbles: true, composed: true, detail: { source: self } }));
+
 	}
 	controlboxButton_click(event) {
 		this.dispatchEvent(new CustomEvent("controlbox_click", { 'detail': event.target }));
@@ -703,33 +728,6 @@ class extends HTMLElement {
 	minimised(event) {
 		console.log("minimise")
 		const self = this;
-		self.innerHTML1 = `	<div class="titlebar">
-		<div class="mrbr-ui-dialogs-controlbox-left">
-			<div class="icon"></div>
-		</div>
-		<div class="mrbr-ui-dialogs-controlbox-centre">
-		<div>Hello</div>
-		</div>
-		<div class="mrbr-ui-dialogs-controlbox-right">
-			<button name="mrbr-ui-dialogs-controlbox-min"></button>
-			<button name="mrbr-ui-dialogs-controlbox-max"></button>
-			<button name="mrbr-ui-dialogs-controlbox-close"></button>
-		</div>
-		</div>
-		<div class="content">
-			<div class="contentcontainer">
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-			</div>
-		</div>
-		<div class="buttonpane">
-			<div class="buttonset">
-				<button name="ok">OK</button>
-				<button name="cancel">Cancel</button>
-			</div>
-		</div>`
 		const window_getComputedStyle = window.getComputedStyle;
 		// let h1 = document.getElementsByTagName("h1")[0];
 		// let source = document.querySelector(".dialog .titlebar .mrbr-ui-dialogs-controlbox-left .icon");
@@ -751,10 +749,11 @@ class extends HTMLElement {
 					const showDialog = () => {
 						self.style.display = self_style_display;
 						self.style.opacity = window_getComputedStyle(self).getPropertyValue("opacity");
-						self.classList.remove("mrbr-ui-dialog-hidden");						
-						self.style.opacity ="";
+						self.classList.remove("mrbr-ui-dialog-hidden");
+						self.style.opacity = "";
 						self.classList.add("mrbr-ui-dialog-visible");
 						self.taskbarButton.removeEventListener("click", showDialog)
+						self.windowState = "normal";
 					}
 					self.taskbarButton.addEventListener("click", showDialog)
 				})();
@@ -766,11 +765,12 @@ class extends HTMLElement {
 		self.taskbarButton = document.createElement("div");
 		self.taskbarButton.classList.add("taskbarbutton");
 
-		self.taskbarButton.innerHTML = `	<div>
-			<div class="icon"></div>
+		self.taskbarButton.innerHTML = `<div>
+			<div class="mrbr-ui-dialogs-icon"></div>
 		<div class="title">Hello</div>
 			<button name="mrbr-ui-dialogs-controlbox-close"></button>
 		</div>`
+		self.taskbarButton.classList.add("mrbr-ui-dialog-visible");
 
 		// let h1 = self.taskbarButton.querySelector(".icon");
 		// let source = document.querySelector(".dialog .titlebar .mrbr-ui-dialogs-controlbox-left .icon");
@@ -780,7 +780,11 @@ class extends HTMLElement {
 		// let source2 = document.querySelector(".dialog .titlebar button[name='mrbr-ui-dialogs-controlbox-close']");
 		// h2.style.backgroundImage = window_getComputedStyle(source2).backgroundImage;
 		self.taskbar.appendChild(self.taskbarButton);
-
+		self.taskbarButton.addEventListener("click", event => {
+			if (self.windowState === "normal") {
+				self.dispatchEvent(new CustomEvent(Mrbr.UI.Dialogs.Dialog.EVENTS.minimised, {}))
+			}
+		});
 	}
 	maximised(event) {
 		const self = this,
@@ -838,9 +842,9 @@ class extends HTMLElement {
 		const self = this;
 
 		self.style.width = `${self._maxX}px`;
-		self.style.left = `0px`;
+		self.style.left = `${self._minX}px`;
 		self.style.height = `${self._maxY}px`;
-		self.style.top = `0px`;
+		self.style.top = `${self._minY}px`;
 		self.windowState = "maximised";
 	}
 	window_resizing() {
@@ -870,12 +874,19 @@ class extends HTMLElement {
 			window_getComputedStyle = window.getComputedStyle;
 		self.classList.remove("mrbr-ui-dialog-visible");
 		self.classList.add("mrbr-ui-dialog-hidden");
+		if (self.taskbarButton) {
+			self.taskbarButton.classList.remove("mrbr-ui-dialog-visible");
+			self.taskbarButton.classList.add("mrbr-ui-dialog-hidden");
+		}
 		((fn, last) => fn(fn, last))((fn, last) => {
 			window.requestAnimationFrame(() => {
 				let opacity = window_getComputedStyle(this).getPropertyValue("opacity");
 				if (opacity > last) { return; }
 				(opacity > 0.1) ? fn(fn, opacity) : (() => {
 					self.style.display = "none";
+					if (self.taskbarButton) {
+						self.taskbarButton.style.display = "none";
+					}
 					//self.dispatchEvent(new CustomEvent(DialogBox.EVENTS.closed, { details: { source: self } }))
 				})();
 			})
@@ -919,7 +930,6 @@ class extends HTMLElement {
 					return;
 				}
 				else {
-					return;
 					fetch(backgroundImageUrl)
 						.then(response => response.text())
 						.then(text => (new window.DOMParser()).parseFromString(text, "text/xml"))
@@ -939,25 +949,30 @@ class extends HTMLElement {
 							const dataUrl = `url('data:image/svg+xml;utf8,${new XMLSerializer().serializeToString(svg).replace(/(\<!--.*?\-->)/g, "").replace(/\n|\r\n|\n\r/g, "")}')`
 							window.requestAnimationFrame(() => { selected.style.backgroundImage = dataUrl })
 						})
+						.catch(error => self.dispatchEvent(new CustomEvent("exception", { details: { source: "setSVGColour", error: error } })))
 				}
 			}
 			else {
-				let data = new window.DOMParser()
-					.parseFromString(backgroundImageUrl.replace(/\\\"/g, "\"").replace(/\\\'/g, "\'"), "text/xml")
-				let svg = data.childNodes[0],
-					script = svg.getElementsByTagName("script")[0];
-				if (script) {
-					svg.removeChild(script);
-				}
-				let paths = data.getElementsByTagName("path");
-				if (paths && paths.length > 0) {
-					for (let pathCounter = 0, pathCount = paths.length; pathCounter < pathCount; pathCounter++) {
-						paths[pathCounter].setAttribute("fill", fill);
-						paths[pathCounter].setAttribute("stroke", stroke);
+				try {
+					let data = new window.DOMParser()
+						.parseFromString(backgroundImageUrl.replace(/\\\"/g, "\"").replace(/\\\'/g, "\'"), "text/xml")
+					let svg = data.childNodes[0],
+						script = svg.getElementsByTagName("script")[0];
+					if (script) {
+						svg.removeChild(script);
 					}
+					let paths = data.getElementsByTagName("path");
+					if (paths && paths.length > 0) {
+						for (let pathCounter = 0, pathCount = paths.length; pathCounter < pathCount; pathCounter++) {
+							paths[pathCounter].setAttribute("fill", fill);
+							paths[pathCounter].setAttribute("stroke", stroke);
+						}
+					}
+					const dataUrl = `url('data:image/svg+xml;utf8,${new XMLSerializer().serializeToString(svg).replace(/(\<!--.*?\-->)/g, "").replace(/\n|\r\n|\n\r/g, "")}')`
+					window.requestAnimationFrame(() => { selected.style.backgroundImage = dataUrl })
+				} catch (error) {
+					self.dispatchEvent(new CustomEvent("exception", { details: { source: "setSVGColour", error: error } }));
 				}
-				const dataUrl = `url('data:image/svg+xml;utf8,${new XMLSerializer().serializeToString(svg).replace(/(\<!--.*?\-->)/g, "").replace(/\n|\r\n|\n\r/g, "")}')`
-				window.requestAnimationFrame(() => { selected.style.backgroundImage = dataUrl })
 			}
 		})
 	}
