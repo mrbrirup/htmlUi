@@ -145,19 +145,19 @@
 }
 
 .dialog .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-close'] {
-	/* background-image: url("assets/images/ic_close_18px.svg"); */
+	background-image: url("ui/resources/images/svg/dialogs/ic_close_18px.svg");
 }
 
 .dialog .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-min'] {
-	/* background-image: url("assets/images/minimise.svg"); */
+	background-image: url("ui/resources/images/svg/dialogs/minimise.svg");
 }
 
 .dialog .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'], .dialog[windowstate='normal'] .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'] {
-	/* background-image: url("assets/images/maximise.svg"); */
+	background-image: url("ui/resources/images/svg/dialogs/maximise.svg");
 }
 
 .dialog[windowstate='maximised'] .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'] {
-	/* background-image: url("assets/images/restore.svg"); */
+	background-image: url("ui/resources/images/svg/dialogs/restore.svg");
 }
 
 .dialog .mrbr-ui-dialogs-buttonset {
@@ -183,7 +183,7 @@
 }
 
 .dialog .mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-left .mrbr-ui-dialogs-icon {
-	/* background-image: url("assets/images/ic_laptop_windows_24px.svg"); */
+	background-image: url("ui/resources/images/svg/dialogs/ic_laptop_windows_24px.svg");
 	width: var(--default-icon-size-1);
 	height: var(--default-icon-size-1);
 	box-sizing: border-box;
@@ -218,13 +218,19 @@
 	position: relative;
 	top: 50%;
 	transform: translateY(-50%);
+	
 }
 
 .taskbarbutton:hover {
-	-moz-box-shadow: inset 0 0 var(--default-control-padded-border-width) var(--default-colour-button-hilight);
-	-webkit-box-shadow: inset 0 0 var(--default-control-padded-border-width) var(--default-colour-button-hilight);
-	box-shadow: inset 0 0 var(--default-control-padded-border-width) var(--default-colour-button-hilight);
+	-moz-box-shadow: inset 0 0 calc(var(--default-control-padded-border-width)*4) var(--default-colour-button-hilight);
+	-webkit-box-shadow: inset 0 0 calc(var(--default-control-padded-border-width)*4) var(--default-colour-button-hilight);
+	box-shadow: inset 0 0 calc(var(--default-control-padded-border-width)*4) var(--default-colour-button-hilight);
 	transition: var(--default-control-animation-speed) box-shadow;
+	transition: var(--default-control-animation-speed) -webkit-box-shadow;
+	transition: var(--default-control-animation-speed) -moz-box-shadow;
+	/* border-width: var(--default-control-padded-border-width) ;
+	border-color: var(--default-colour-button-hilight) ;
+	border-style: outset; */
 }
 
 .taskbarbutton>div {

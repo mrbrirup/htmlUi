@@ -199,6 +199,7 @@ class extends HTMLElement {
 		self._maxX = Math.max.apply(null, arrMaxX)
 		const considerSelfTaskbarSize = self.taskbar.parentElement === self.parentElement;
 		self._maxY = Math.max.apply(null, arrMaxY) - (considerSelfTaskbarSize ? parseFloat(self.taskbar.clientHeight) : 0) - parseFloat(window.getComputedStyle(self).getPropertyValue("--default-control-border-width"));
+		//self._maxY = Math.max.apply(null, arrMaxY) - (considerSelfTaskbarSize ? parseFloat(self.taskbar.clientHeight) : 0) - parseFloat(window.getComputedStyle(self).getPropertyValue("--default-control-border-width"));
 		//self._minX = Math.max(parseFloat(container.clientWidth), parseFloat(container.offsetX), parseFloat(container.style.left))
 		self._minX = Math.max(parseFloat(container.offsetLeft), isNaN(parseFloat(container.offsetX)) ? 0 : parseFloat(container.offsetX), isNaN(parseFloat(container.style.left)) ? 0 : parseFloat(container.style.left))
 		self._minY = Math.max(parseFloat(container.offsetTop), isNaN(parseFloat(container.offsetY)) ? 0 : parseFloat(container.offsetY), isNaN(parseFloat(container.style.top)) ? 0 : parseFloat(container.style.top))
@@ -491,7 +492,7 @@ class extends HTMLElement {
 		if (dx < 0 && left + self._startWidth + borderSize * 2 > self._maxX + self._minX  ) { left = self._maxX - (self._startWidth + borderSize * 4 + 2) + self._minX ; }
 		else if (dx > 0 && left < self._minX) { left = self._minX; }
 
-		if (dy < 0 && top + self._startHeight + borderSize * 2 > self._maxY + self._minY) { top = self._maxY - (self._startHeight  + borderSize * 4 + 2); + self._minY }
+		if (dy < 0 && top + self._startHeight + borderSize * 2 > self._maxY + self._minY) { top = self._maxY - (self._startHeight  + borderSize * 4 + 2) + self._minY }
 		else if (dy > 0 && top < self._minY) { top = self._minY; }
 
 
@@ -754,6 +755,7 @@ class extends HTMLElement {
 						self.classList.add("mrbr-ui-dialog-visible");
 						self.taskbarButton.removeEventListener("click", showDialog)
 						self.windowState = "normal";
+						self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", { bubbles: true, composed: true, detail: { source: self } }));
 					}
 					self.taskbarButton.addEventListener("click", showDialog)
 				})();
@@ -761,7 +763,8 @@ class extends HTMLElement {
 		})
 	}
 	createTaskbarButton() {
-		const self = this;
+		const self = this,
+		window_getComputedStyle = window.getComputedStyle;
 		self.taskbarButton = document.createElement("div");
 		self.taskbarButton.classList.add("taskbarbutton");
 
@@ -772,13 +775,16 @@ class extends HTMLElement {
 		</div>`
 		self.taskbarButton.classList.add("mrbr-ui-dialog-visible");
 
-		// let h1 = self.taskbarButton.querySelector(".icon");
-		// let source = document.querySelector(".dialog .titlebar .mrbr-ui-dialogs-controlbox-left .icon");
-		// h1.style.backgroundImage = window_getComputedStyle(source).backgroundImage;
+		let target = self.taskbarButton.querySelector(".mrbr-ui-dialogs-icon");
+		let source = document.querySelector(".dialog .mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-left .mrbr-ui-dialogs-icon");
+		target.style.backgroundImage = window_getComputedStyle(source).backgroundImage;
+		self.setSVGColour(".mrbr-ui-dialogs-icon", self.taskbarButton)
+		
+		target= self.taskbarButton.querySelector("div > button[name='mrbr-ui-dialogs-controlbox-close']");
+		source = self.querySelector(".dialog .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-close']");
+		target.style.backgroundImage = window_getComputedStyle(source).backgroundImage;
+		self.setSVGColour("div > button[name='mrbr-ui-dialogs-controlbox-close']", self.taskbarButton)
 
-		// let  h2= self.taskbarButton.querySelector("div > button[name='mrbr-ui-dialogs-controlbox-close']");
-		// let source2 = document.querySelector(".dialog .titlebar button[name='mrbr-ui-dialogs-controlbox-close']");
-		// h2.style.backgroundImage = window_getComputedStyle(source2).backgroundImage;
 		self.taskbar.appendChild(self.taskbarButton);
 		self.taskbarButton.addEventListener("click", event => {
 			if (self.windowState === "normal") {
@@ -892,10 +898,10 @@ class extends HTMLElement {
 			})
 		})
 	}
-	setSVGColour(selector) {
+	setSVGColour(selector, self) {
 		window.requestAnimationFrame(() => {
 
-			const self = this;
+			self = self || this;
 			let selected = self.querySelector(selector),
 				computedStyle = window.getComputedStyle(selected);
 			let cssUrl = computedStyle.backgroundImage;
