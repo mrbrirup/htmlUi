@@ -1,4 +1,4 @@
-.dialog {
+mrbr-ui-dialogs-dialog {
 	box-sizing: border-box;
 	display: none;
 	font-family: var(--default-control-font-name);
@@ -7,18 +7,11 @@
 	background: var(--default-colour-window);
 	border: var(--default-control-border-style) var(--default-control-border-width) var(--default-control-border-color);
 	position: absolute;
-	/* opacity: 1;
-	animation-fill-mode: forwards;
-	transition: var(--default-control-animation-speed) opacity; */
+	-webkit-box-shadow: 0px 0px 5px 3px rgba(0,0,0,0.25);
+	-moz-box-shadow: 0px 0px 5px 3px rgba(0,0,0,0.25);
+	box-shadow: 0px 0px 5px 3px rgba(0,0,0,0.25);
 }
-
-/* .dialog:not(.mrbr-ui-dialog-hidden){	
-	opacity: 1;
-	animation-fill-mode: forwards;
-	transition: var(--default-control-animation-speed) opacity;
-} */
-
-.dialog .mrbr-ui-dialogs-titlebar, .taskbarbutton {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-titlebar, .taskbarbutton {
 	box-sizing: border-box;
 	line-height: var(--default-control-caption-height);
 	vertical-align: middle;
@@ -35,11 +28,12 @@
 	justify-content: space-between;
 }
 
-.dialog .mrbr-ui-dialogs-titlebar {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-titlebar {
 	height: var(--default-control-caption-height);
+	user-select: none;
 }
 
-.dialog[windowstate='normal'] .mrbr-ui-dialogs-titlebar {
+mrbr-ui-dialogs-dialog[windowstate='normal'] .mrbr-ui-dialogs-titlebar {
 	cursor: move;
 }
 
@@ -83,7 +77,7 @@
 	flex: 1;
 }
 
-.dialog .mrbr-ui-dialogs-content {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-content {
 	box-sizing: border-box;
 	position: absolute;
 	top: calc(var(--default-control-caption-height) + var(--default-control-padding));
@@ -92,7 +86,7 @@
 	font-size: var(--default-control-font-size);
 }
 
-.dialog .mrbr-ui-dialogs-buttonbar:before {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-buttonbar:before {
 	width: 100%;
 	height: 0;
 	border-bottom: var(--default-control-border-style) var(--default-control-border-width) var(--default-control-border-color);
@@ -102,7 +96,7 @@
 	left: 0px;
 }
 
-.dialog .mrbr-ui-dialogs-buttonbar {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-buttonbar {
 	box-sizing: border-box;
 	width: 100%;
 	position: absolute;
@@ -114,19 +108,19 @@
 	position: absolute;
 }
 
-.dialog .mrbr-ui-dialogs-buttonset {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-buttonset {
 	background-color: var(--default-colour-button-shadow);
 }
 
-.dialog button {
+mrbr-ui-dialogs-dialog button {
 	color: var(--default-colour-button-text);
 }
 
-.dialog button:hover, .dialog button.active {
+mrbr-ui-dialogs-dialog button:hover, mrbr-ui-dialogs-dialog button.active {
 	cursor: pointer;
 }
 
-.dialog .mrbr-ui-dialogs-titlebar button, .taskbarbutton button {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-titlebar button, .taskbarbutton button {
 	width: var(--default-icon-size-1);
 	height: var(--default-icon-size-1);
 	border: 0;
@@ -140,27 +134,27 @@
 	background-position: center;
 }
 
-.dialog .mrbr-ui-dialogs-titlebar button:hover, .dialog .mrbr-ui-dialogs-buttonbar .mrbr-ui-dialogs-buttonset button:hover {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-titlebar button:hover, mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-buttonbar .mrbr-ui-dialogs-buttonset button:hover {
 	background-color: var(--default-colour-button-hilight);
 }
 
-.dialog .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-close'] {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-close'] {
 	background-image: url("ui/resources/images/svg/dialogs/ic_close_18px.svg");
 }
 
-.dialog .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-min'] {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-min'] {
 	background-image: url("ui/resources/images/svg/dialogs/minimise.svg");
 }
 
-.dialog .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'], .dialog[windowstate='normal'] .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'] {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'], mrbr-ui-dialogs-dialog[windowstate='normal'] .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'] {
 	background-image: url("ui/resources/images/svg/dialogs/maximise.svg");
 }
 
-.dialog[windowstate='maximised'] .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'] {
+mrbr-ui-dialogs-dialog[windowstate='maximised'] .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'] {
 	background-image: url("ui/resources/images/svg/dialogs/restore.svg");
 }
 
-.dialog .mrbr-ui-dialogs-buttonset {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-buttonset {
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
@@ -168,7 +162,7 @@
 	margin-right: var(--default-control-padding)
 }
 
-.dialog .mrbr-ui-dialogs-buttonset button {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-buttonset button {
 	padding: var(--default-control-padding);
 	height: var(--default-control-height);
 	min-width: calc(var(--default-control-width)*4);
@@ -178,11 +172,11 @@
 	color: var(--default-colour-button-text);
 }
 
-.dialog .mrbr-ui-dialogs-buttonset button:first-child {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-buttonset button:first-child {
 	margin-left: 0;
 }
 
-.dialog .mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-left .mrbr-ui-dialogs-icon {
+mrbr-ui-dialogs-dialog .mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-left .mrbr-ui-dialogs-icon {
 	background-image: url("ui/resources/images/svg/dialogs/ic_laptop_windows_24px.svg");
 	width: var(--default-icon-size-1);
 	height: var(--default-icon-size-1);
@@ -244,11 +238,12 @@
 	margin-bottom: auto;
 }
 
-.taskbarbutton>div>.title {
+.taskbarbutton>div>.mrbr-ui-dialogs-taskbarbutton-title {
 	margin-top: auto;
 	margin-bottom: auto;
 	flex: 1;
 	line-height: var(--default-icon-size-1);
+	user-select: none;
 }
 
 .taskbarbutton>div>button {
