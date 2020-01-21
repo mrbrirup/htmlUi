@@ -4,7 +4,7 @@ class extends HTMLElement {
         return [new entry(entry.FileTypes.Style, "Mrbr.UI.Dialogs.Dialog")];
     }
 	static get using() { return ["Mrbr.System.EventHandler"]; }
-	constructor() {
+	constructor(config) {
 		super();
 		this._minWidth = 100;
 		this._minHeight = 1;
@@ -31,7 +31,15 @@ class extends HTMLElement {
 		this._taskbarContainer = null;
 		this._closing = [];
 		this._eventHandler = new Mrbr.System.EventHandler({ target: this });
+		this._template = (config && config.template) ? config.template : this.innerHTML;
+		this._contentTemplate = (config && config.content) ? config.content : "";
+		this._buttonTemplate = (config && config.buttons) ? config.buttons : "";
+        this._template1 = Mrbr.UI.Utils.Utils.template("Mrbr.UI.Dialogs.Dialog");
 	}
+	set contentTemplate(value){
+		this._contentTemplate = value;
+	}
+	get contentTemplate(){return this._contentTemplate;}
 	get taskbarContainer() { return this._taskbarContainer }
 	set taskbarContainer(value) {
 		const this_taskbarContainer = this._taskbarContainer;
@@ -155,33 +163,8 @@ class extends HTMLElement {
 	}
 	connectedCallback() {
 		const self = this;
-		self.innerHTML = `	<div class="mrbr-ui-dialogs-titlebar">
-		<div class="mrbr-ui-dialogs-controlbox-left">
-			<div class="mrbr-ui-dialogs-icon"></div>
-		</div>
-		<div class="mrbr-ui-dialogs-controlbox-centre">
-		<div class="mrbr-ui-dialogs-title"></div>
-		</div>
-		<div class="mrbr-ui-dialogs-controlbox-right">
-			<button name="mrbr-ui-dialogs-controlbox-min"></button>
-			<button name="mrbr-ui-dialogs-controlbox-max"></button>
-			<button name="mrbr-ui-dialogs-controlbox-close"></button>
-		</div>
-		</div>
-		<div class="mrbr-ui-dialogs-content">
-			<div class="mrbr-ui-dialogs-contentcontainer">
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-			</div>
-		</div>
-		<div class="mrbr-ui-dialogs-buttonbar">
-			<div class="mrbr-ui-dialogs-buttonset">
-				<button name="ok">OK</button>
-				<button name="cancel">Cancel</button>
-			</div>
-		</div>`
+		//self.innerHTML = ``
+		self.innerHTML = self._template + self._template1;
 		self._init();
 	}
 	maxSize() {
@@ -692,6 +675,9 @@ class extends HTMLElement {
 		self.wireEvents();
 		self.createTaskBar();
 		self.setTitle();
+		const tmpl = document.createElement("template");
+		tmpl.innerHTML = self.contentTemplate;
+		this.appendChild(tmpl);		
 		self.classList.add("mrbr-ui-dialog-visible");
 	}
 	setTitle() {
