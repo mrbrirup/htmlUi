@@ -1,8 +1,8 @@
 class extends HTMLElement {
 	static get manifest() {
-        const entry = Mrbr.System.ManifestEntry;
-        return [new entry(entry.FileTypes.Style, "Mrbr.UI.Dialogs.Dialog")];
-    }
+		const entry = Mrbr.System.ManifestEntry;
+		return [new entry(entry.FileTypes.Style, "Mrbr.UI.Dialogs.Dialog")];
+	}
 	static get using() { return ["Mrbr.System.EventHandler"]; }
 	constructor(config) {
 		super();
@@ -34,12 +34,12 @@ class extends HTMLElement {
 		this._template = (config && config.template) ? config.template : this.innerHTML;
 		this._contentTemplate = (config && config.content) ? config.content : "";
 		this._buttonTemplate = (config && config.buttons) ? config.buttons : "";
-        this._template1 = Mrbr.UI.Utils.Utils.template("Mrbr.UI.Dialogs.Dialog");
+		this._template1 = Mrbr.UI.Utils.Utils.template("Mrbr.UI.Dialogs.Dialog");
 	}
-	set contentTemplate(value){
+	set contentTemplate(value) {
 		this._contentTemplate = value;
 	}
-	get contentTemplate(){return this._contentTemplate;}
+	get contentTemplate() { return this._contentTemplate; }
 	get taskbarContainer() { return this._taskbarContainer }
 	set taskbarContainer(value) {
 		const this_taskbarContainer = this._taskbarContainer;
@@ -163,8 +163,9 @@ class extends HTMLElement {
 	}
 	connectedCallback() {
 		const self = this;
-		//self.innerHTML = ``
-		self.innerHTML = self._template + self._template1;
+		self.attachShadow({ mode: "open" });
+		self.shadowRoot.innerHTML = self._template + self._template1;
+		self.shadowRoot.querySelector(".mrbr-ui-dialogs-contentcontainer").innerHTML = self.contentTemplate;
 		self._init();
 	}
 	maxSize() {
@@ -207,7 +208,8 @@ class extends HTMLElement {
 		const self = this,
 			eventHandler = this.eventHandler;
 
-		if (!(self.isDraggableHeader(evt.target) ||
+		if (!(self.isDraggableHeader(evt) ||
+			self === evt.target ||
 			self._dialogContent === evt.target ||
 			self._dialogContent.parentElement === evt.target ||
 			self._dialogButtonPane === evt.target
@@ -223,9 +225,10 @@ class extends HTMLElement {
 		self._startHeight = self.clientHeight;
 		self._leftPos = rect.left;
 		self._topPos = rect.top;
-		if (self.isDraggableHeader(evt.target) && self._resizeMode == '') {
-			self._setCursor('move');
+		if (self.isDraggableHeader(evt) && self._resizeMode == '') {
+			self._setCursor("move");
 			self._isDrag = true;
+			self._dialogTitle.style.cursor = "move";
 		}
 		else if (self.windowState === "normal" && self._resizeMode != '') {
 			self._isResize = true;
@@ -235,22 +238,35 @@ class extends HTMLElement {
 		}
 		evt.preventDefault();
 	}
-	isDraggableHeader(target) {
-		const self = this;
+	inElementBounds(event, element) {
+		const rect = element.getBoundingClientRect(),
+			x = event.clientX,
+			y = event.clientY;
+		return (x < rect.left || x >= rect.right) || (y < rect.top || y >= rect.bottom) ? false : true;
+	}
+
+	isDraggableHeader(event) {
+		const self = this,
+			target = event.target
 		return self.windowState === "normal"
 			&& (
+				(target === self && self.inElementBounds(event, self._dialogTitle)) ||
 				target === self._dialogTitle ||
 				(target.parentElement && target.parentElement === self._dialogTitle) ||
 				(target.parentElement && target.parentElement.parentElement && target.parentElement.parentElement === self._dialogTitle))
 	}
 	_onMouseMove(evt) {
 		const self = this;
-		if (!(self.isDraggableHeader(evt.target) ||
+		if (!(self.isDraggableHeader(evt) ||
+
+			self === evt.target ||
 			self._dialogContent === evt.target ||
 			self._dialogContent.parentElement === evt.target ||
 			self._dialogButtonPane === evt.target) &&
 			!self._isDrag &&
-			self._resizeMode == '') { return; }
+			self._resizeMode == '') {
+			return;
+		}
 		const thisStyle = window.getComputedStyle(self),
 			borderSize = parseFloat(thisStyle.getPropertyValue("--default-control-border-width")) * parseFloat(thisStyle.getPropertyValue("--default-size"));
 		if (self._isDrag) {
@@ -258,12 +274,11 @@ class extends HTMLElement {
 		}
 		else if (self._isResize) {
 			self.isResizing(evt);
-		}
-		else if (evt.target.tagName.toLowerCase() !== 'button') {
-			self.setResizing(evt);
-		}
-		if (evt.target === self) {
 			evt.stopPropagation();
+		}
+
+		else {
+			self.setResizing(evt);
 		}
 		evt.preventDefault();
 	};
@@ -272,21 +287,22 @@ class extends HTMLElement {
 		const self = this;
 		let cursorStyle, resizeMode = '';
 		if (self.windowState === "normal" &&
-			(self.isDraggableHeader(evt.target) ||
+			(self.isDraggableHeader(evt) ||
+				self === evt.target ||
 				self._dialogContent === evt.target ||
 				self._dialogContent.parentElement === evt.target ||
 				self._dialogButtonPane === evt.target)) {
 			let rect = self._getOffset(self);
-			if (evt.pageY < rect.top + self._resizePixel) {
+			if (evt.pageY - self._resizePixel < rect.top + self._resizePixel) {
 				resizeMode = 'n';
 			}
-			else if (evt.pageY > rect.bottom - self._resizePixel) {
+			else if (evt.pageY + self._resizePixel > rect.bottom - self._resizePixel) {
 				resizeMode = 's';
 			}
-			if (evt.pageX < rect.left + self._resizePixel) {
+			if (evt.pageX - self._resizePixel < rect.left + self._resizePixel) {
 				resizeMode += 'w';
 			}
-			else if (evt.pageX > rect.right - self._resizePixel) {
+			else if (evt.pageX + self._resizePixel > rect.right - self._resizePixel) {
 				resizeMode += 'e';
 			}
 		}
@@ -493,6 +509,8 @@ class extends HTMLElement {
 		if (dy < 0 && top + self._startHeight + borderSize * 2 > self._maxY + self._minY) { top = self._maxY - (self._startHeight + borderSize * 4 + 2) + self._minY }
 		else if (dy > 0 && top < self._minY) { top = self._minY; }
 
+		self._setCursor("move");
+		self._dialogTitle.style.cursor = "move";
 
 		if (left + self._startWidth + borderSize * 2 > self._maxX + self._minX) { left = self._maxX - (self._startWidth + borderSize * 4 + 1); }
 		if (top + self._startHeight + borderSize * 2 > self._maxY + self._minY) { top = self._maxY - (self._startHeight + borderSize * 4 + 1); }
@@ -520,22 +538,18 @@ class extends HTMLElement {
 	_onMouseUp(event) {
 		const self = this,
 			eventHandler = self.eventHandler;
-		if (!(self.isDraggableHeader(event.target) || event.target === self._buttons[0] || self._dialogButtonPane === event.target) && !self._isDrag && self._resizeMode == '')
-			{return;}
-		self._documentMouseMove = eventHandler.remove(self._documentMouseMove_handle);
-		self._documentMouseUp = eventHandler.remove(self._documentMouseUp_handle);
+		if (!(self.isDraggableHeader(event) || self._dialogButtonPane === event.target) && !self._isDrag && self._resizeMode == '') { return; }
+		self._documentMouseMove_handle = eventHandler.remove(self._documentMouseMove_handle);
+		self._documentMouseUp_handle = eventHandler.remove(self._documentMouseUp_handle);
 		if (self._isDrag) {
 			self._setCursor('');
 			self._isDrag = false;
+			self._dialogTitle.style.cursor = "";
 		}
 		else if (self._isResize) {
 			self._setCursor('');
 			self._isResize = false;
 			self._resizeMode = '';
-		}
-		else if (self._isButton) {
-			self._whichButton.classList.remove('active');
-			self._isButton = false;
 		}
 		event.preventDefault();
 		event.stopPropagation();
@@ -561,32 +575,36 @@ class extends HTMLElement {
 
 	_setDialogContent() {
 		const self = this,
-		_dialogContentStyle = window.getComputedStyle(self._dialogContent);
+			_dialogContentStyle = window.getComputedStyle(self._dialogContent);
 		let _dialogButtonPaneStyle,
-		_dialogButtonPaneStyleBefore;
+			_dialogButtonPaneStyleBefore;
 		if (self._buttons.length > 1) {
 			_dialogButtonPaneStyle = window.getComputedStyle(self._dialogButtonPane);
 			_dialogButtonPaneStyleBefore = window.getComputedStyle(self._dialogButtonPane, ":before");
 		}
 		const width = self.clientWidth
-		- parseInt(_dialogContentStyle.left)
-		- (parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size")))
-		- self._dialogContent.offsetWidth - self._dialogContent.clientWidth,
-			height = self.clientHeight - (
-				parseInt(_dialogContentStyle.top)
-				+ (parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size")))
-				+ self._dialogContent.offsetHeight - self._dialogContent.clientHeight
-				+ (self._buttons.length > 1 ?
-					+ parseInt(_dialogButtonPaneStyleBefore.borderBottom ? _dialogButtonPaneStyleBefore.borderBottom : "0")
-					- parseInt(_dialogButtonPaneStyleBefore.top)
-					+ parseInt(_dialogButtonPaneStyle.height)
-					+ parseInt(_dialogButtonPaneStyle.bottom)
-					: 0)
-					);
-		self._dialogContent.style.width = `${width}px`;
-		self._dialogContent.style.height = `${height}px`;
-
-		if (self._dialogButtonPane) { self._dialogButtonPane.style.width = `${width}px`; }
+			- parseInt(_dialogContentStyle.left)
+			- (parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size")))
+		let height = self.clientHeight - (
+			parseInt(_dialogContentStyle.top)
+			+ (parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size")))
+			+ self._dialogContent.offsetHeight - self._dialogContent.clientHeight
+			+ (self._buttons.length > 1 ?
+				+ parseInt(_dialogButtonPaneStyleBefore.borderBottom ? _dialogButtonPaneStyleBefore.borderBottom : "0")
+				- parseInt(_dialogButtonPaneStyleBefore.top)
+				+ parseInt(_dialogButtonPaneStyle.height)
+				+ parseInt(_dialogButtonPaneStyle.bottom)
+				: 0)
+		);
+		let bottom = + (parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size"))) * 2
+			+ self._dialogContent.offsetHeight - self._dialogContent.clientHeight
+			+ parseInt(_dialogButtonPaneStyleBefore.borderBottom ? _dialogButtonPaneStyleBefore.borderBottom : "0") * 2
+			+ (self._buttons.length > 1 ?
+				- parseInt(_dialogButtonPaneStyleBefore.top)
+				+ parseInt(_dialogButtonPaneStyle.height)
+				+ parseInt(_dialogButtonPaneStyle.bottom)
+				: 0)
+		self._dialogContent.style.bottom = `${bottom}px`
 	}
 	showDialog() {
 		const self = this;
@@ -605,7 +623,7 @@ class extends HTMLElement {
 			if (desktop && desktop[0]) {
 				self._desktopNavlocationChange_handle = self.eventHandler.add("mrbr-ui-desktop-navlocation-change", function (event) {
 					self.taskbar.setAttribute("navlocation", event.detail);
-					if(self.windowState === "maximised"){
+					if (self.windowState === "maximised") {
 						self.window_resizing(event);
 					}
 				}, { target: desktop[0] })
@@ -622,17 +640,16 @@ class extends HTMLElement {
 		const self = this,
 			style = self.style,
 			eventHandler = self.eventHandler;
-
 		style.visibility = 'hidden';
 		style.display = 'block';
-		self._dialogTitle = self.querySelector('.mrbr-ui-dialogs-titlebar');
-		self._dialogContent = self.querySelector('.mrbr-ui-dialogs-content');
-		self._dialogButtonPane = self.querySelector('.mrbr-ui-dialogs-buttonbar');
-		self._buttons = self.querySelectorAll('button');
+		self._dialogTitle = self.shadowRoot.querySelector('.mrbr-ui-dialogs-titlebar');
+
+		self._dialogContent = self.shadowRoot.querySelector('.mrbr-ui-dialogs-content');
+		self._dialogButtonPane = self.shadowRoot.querySelector('.mrbr-ui-dialogs-buttonbar');
+		self._buttons = self.shadowRoot.querySelectorAll('button');
 		let buttonsetStyle = window.getComputedStyle(self._dialogButtonPane.querySelector('.mrbr-ui-dialogs-buttonset')),
 			buttonSetStyleWidth = parseFloat(buttonsetStyle.width);
 		let _dialogStyle = window.getComputedStyle(self),
-			_dialogTitleStyle = window.getComputedStyle(self._dialogTitle),
 			_dialogContentStyle = window.getComputedStyle(self._dialogContent),
 			_dialogButtonPaneStyle,
 			_dialogButtonPaneStyleBefore,
@@ -666,24 +683,17 @@ class extends HTMLElement {
 		style.visibility = 'visible';
 
 		self._dialogContent.childNodes[0].tabIndex = '0';
-		self._dialogMouseDown_handle = eventHandler.add('mousedown', self._onMouseDown.bind(self));
-		self._dialogButtonPane_mouseMove_handle = eventHandler.add('mousemove', self._onMouseMove.bind(self), { target: self._dialogButtonPane });
-		self._dialog_mouseMove_handle = eventHandler.add('mousemove', self._onMouseMove.bind(self));
-		const controlboxRight = self.querySelector(".mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-right");
+		const controlboxRight = self.shadowRoot.querySelector(".mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-right");
 		self.setSVGColour(".mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-left .mrbr-ui-dialogs-icon");
 		self._resizePixel = 2 * ((parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size"))) + parseFloat(_dialogContentStyle.getPropertyValue("--default-control-border-width")));
 		self.wireEvents();
 		self.createTaskBar();
 		self.setTitle();
-		const tmpl = document.createElement("template");
-		tmpl.innerHTML = self.contentTemplate;
-		this.appendChild(tmpl);		
 		self.classList.add("mrbr-ui-dialog-visible");
 	}
 	setTitle() {
 		const self = this;
-		let mrbrUiDialogsTitle = self.querySelector(".mrbr-ui-dialogs-title");
-		//debugger;
+		let mrbrUiDialogsTitle = self.shadowRoot.querySelector(".mrbr-ui-dialogs-title");
 		if (!mrbrUiDialogsTitle || !self.title) { return; }
 		mrbrUiDialogsTitle.innerHTML = "";
 		mrbrUiDialogsTitle.appendChild(document.createTextNode(self.title));
@@ -697,8 +707,11 @@ class extends HTMLElement {
 	wireEvents() {
 		const self = this,
 			eventHandler = self.eventHandler,
-			controlboxRight = self.querySelector(".mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-right");
+			controlboxRight = self.shadowRoot.querySelector(".mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-right");
 		self._controlboxButton_click_handle = [];
+		self._dialogMouseDown_handle = eventHandler.add('mousedown', self._onMouseDown.bind(self), { target: self });
+		self._dialog_mouseMove_handle = eventHandler.add('mousemove', self._onMouseMove.bind(self), { target: self });
+
 		if (controlboxRight !== undefined) {
 			[
 				controlboxRight.querySelector("button[name='mrbr-ui-dialogs-controlbox-min']"),
@@ -707,19 +720,19 @@ class extends HTMLElement {
 			].forEach(btn => {
 				if (btn === undefined) { return; }
 				self.controlboxButtons.push(btn);
-				self._controlboxButton_click_handle[btn.name] = eventHandler.add("click", self.controlboxButton_click.bind(self),{target:btn});
+				self._controlboxButton_click_handle[btn.name] = eventHandler.add("click", self.controlboxButton_click.bind(self), { target: btn });
 			})
-			self._controlboxClick_handle = eventHandler.add("controlbox_click", self.controlboxClick.bind(self))
+			self._controlboxClick_handle = eventHandler.add("controlbox_click", self.controlboxClick.bind(self), { target: self })
 		}
-		self._minimised_handle = eventHandler.add(Mrbr.UI.Dialogs.Dialog.EVENTS.minimised, self.minimised.bind(self))
-		self._maximised_handle = eventHandler.add(Mrbr.UI.Dialogs.Dialog.EVENTS.maximised, self.maximised.bind(self))
-		self._closing_handle = eventHandler.add(Mrbr.UI.Dialogs.Dialog.EVENTS.closing, self.closing.bind(self))
+		self._minimised_handle = eventHandler.add(Mrbr.UI.Dialogs.Dialog.EVENTS.minimised, self.minimised.bind(self), { target: self })
+		self._maximised_handle = eventHandler.add(Mrbr.UI.Dialogs.Dialog.EVENTS.maximised, self.maximised.bind(self), { target: self })
+		self._closing_handle = eventHandler.add(Mrbr.UI.Dialogs.Dialog.EVENTS.closing, self.closing.bind(self), { target: self })
 		self._mousedown_handle = eventHandler.add("mousedown", event => {
 			self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", { bubbles: true, composed: true, detail: { source: self } }));
 		});
 		self.dispatchEvent(new CustomEvent("mrbr-control-layer-register", { bubbles: true, composed: true, detail: { source: self } }));
 		self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", { bubbles: true, composed: true, detail: { source: self } }));
-		self._titleChange_handle = eventHandler.add("mrbr-ui-dialogs-title-change", self.setTitle.bind(self))
+		self._titleChange_handle = eventHandler.add("mrbr-ui-dialogs-title-change", self.setTitle.bind(self), { target: self })
 	}
 	controlboxButton_click(event) {
 		this.dispatchEvent(new CustomEvent("controlbox_click", { 'detail': event.target }));
@@ -773,7 +786,6 @@ class extends HTMLElement {
 			window_getComputedStyle = window.getComputedStyle;
 		self.taskbarButton = document.createElement("div");
 		self.taskbarButton.classList.add("taskbarbutton");
-
 		self.taskbarButton.innerHTML = `<div>
 			<div class="mrbr-ui-dialogs-icon"></div>
 		<div class="mrbr-ui-dialogs-taskbarbutton-title"></div>
@@ -782,17 +794,16 @@ class extends HTMLElement {
 		self.taskbarButton.classList.add("mrbr-ui-dialog-visible");
 
 		let target = self.taskbarButton.querySelector(".mrbr-ui-dialogs-icon");
-		let source = self.querySelector(".mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-left .mrbr-ui-dialogs-icon");
+		let source = self.shadowRoot.querySelector(".mrbr-ui-dialogs-titlebar .mrbr-ui-dialogs-controlbox-left .mrbr-ui-dialogs-icon");
 		target.style.backgroundImage = window_getComputedStyle(source).backgroundImage;
 		self.setSVGColour(".mrbr-ui-dialogs-icon", self.taskbarButton)
 
 		target = self.taskbarButton.querySelector("div > button[name='mrbr-ui-dialogs-controlbox-close']");
-		source = self.querySelector(".mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-close']");
+		source = self.shadowRoot.querySelector(".mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-close']");
 		target.style.backgroundImage = window_getComputedStyle(source).backgroundImage;
 		self.setSVGColour("div > button[name='mrbr-ui-dialogs-controlbox-close']", self.taskbarButton)
-
 		self.taskbar.appendChild(self.taskbarButton);
-		source.addEventListener("click",()=>{
+		source.addEventListener("click", () => {
 			window.requestAnimationFrame(() => self.taskbarButton.dispatchEvent(new CustomEvent(Mrbr.UI.Dialogs.Dialog.EVENTS.closing, { detail: { event, cancelClose: false } })))
 		})
 		self._taskbarButton_click = self.eventHandler.add("click", event => {
@@ -804,6 +815,7 @@ class extends HTMLElement {
 				self.dispatchEvent(new CustomEvent(Mrbr.UI.Dialogs.Dialog.EVENTS.minimised, {}))
 			}
 		}, { target: self.taskbarButton });
+		self.setTitle();
 	}
 	removeTaskbarButton() {
 		const self = this;
@@ -835,7 +847,7 @@ class extends HTMLElement {
 					})()
 				})
 			})
-			self._windowResize_handle = self.eventHandler.add("resize", self.window_resizing.bind(self),{target:window})
+			self._windowResize_handle = self.eventHandler.add("resize", self.window_resizing.bind(self), { target: window })
 		}
 		else {
 			self.classList.add("mrbr-ui-dialog-hidden");
@@ -917,7 +929,7 @@ class extends HTMLElement {
 	}
 	destroy() {
 		let self = this;
-		window.requestAnimationFrame(()=>{
+		window.requestAnimationFrame(() => {
 			self.eventHandler.removeAll();
 			self.removeTaskbarButton();
 			self.parentElement.removeChild(this);
@@ -925,11 +937,11 @@ class extends HTMLElement {
 		});
 	}
 	setSVGColour(selector, self) {
-		
+
 		window.requestAnimationFrame(() => {
 
 			self = self || this;
-			let selected = self.querySelector(selector),
+			let selected = (self.shadowRoot) ? self.shadowRoot.querySelector(selector) : self.querySelector(selector),
 				computedStyle = window.getComputedStyle(selected);
 			let cssUrl = computedStyle.backgroundImage;
 			if (cssUrl === undefined) { return; }
