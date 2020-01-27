@@ -6,35 +6,29 @@ class extends HTMLElement {
 	static get using() { return ["Mrbr.System.EventHandler"]; }
 	constructor(config) {
 		super();
-		this._minWidth = 100;
-		this._minHeight = 1;
-		this._resizePixel = 5;
-		this._parent;
-		this._dialogTitle;
-		this._dialogContent;
-		this._dialogButtonPane;
-		this._maxX;
-		this._maxY;
-		this._startX;
-		this._startY;
-		this._startWidth;
-		this._startHeight;
-		this._leftPos;
-		this._topPos;
-		this._isDrag = false;
-		this._isResize = false;
-		this._resizeMode = '';
-		this._buttons;
-		this._setDialogContent;
-		this.controlboxButtons = [];
-		this._container = null;
-		this._taskbarContainer = null;
-		this._closing = [];
-		this._eventHandler = new Mrbr.System.EventHandler({ target: this });
-		this._template = (config && config.template) ? config.template : this.innerHTML;
-		this._contentTemplate = (config && config.content) ? config.content : "";
-		this._buttonTemplate = (config && config.buttons) ? config.buttons : "";
-		this._template1 = Mrbr.UI.Utils.Utils.template("Mrbr.UI.Dialogs.Dialog");
+		const self = this;
+		self._minWidth = 320;
+		self._minHeight = 280;
+		self._resizePixel = 5;
+		self._isDrag = false;
+		self._isResize = false;
+		self._resizeMode = '';
+		self.controlboxButtons = [];
+		self._container = null;
+		self._taskbarContainer = null;
+		self._closing = [];
+		self._eventHandler = new Mrbr.System.EventHandler({ target: self });
+		self._template = (config && config.template) ? config.template : self.innerHTML;
+		self._contentTemplate = (config && config.content) ? config.content : "";
+		self._buttonTemplate = (config && config.buttons) ? config.buttons : "";
+		self._template1 = Mrbr.UI.Utils.Utils.template("Mrbr.UI.Dialogs.Dialog");
+		self._dialog_resize_size = {
+			left: null,
+			top: null,
+			width: null,
+			height: null
+		};
+
 	}
 	set contentTemplate(value) {
 		this._contentTemplate = value;
@@ -197,46 +191,75 @@ class extends HTMLElement {
 		}
 		self._maxX = Math.max.apply(null, arrMaxX)
 		const considerSelfTaskbarSize = self.taskbar.parentElement === self.parentElement;
-		self._maxY = Math.max.apply(null, arrMaxY) - (considerSelfTaskbarSize ? parseFloat(self.taskbar.clientHeight) : 0) - parseFloat(window.getComputedStyle(self).getPropertyValue("--default-control-border-width"));
+		self._maxY = Math.max.apply(null, arrMaxY) - parseFloat(window.getComputedStyle(self).getPropertyValue("--default-control-border-width"));
 		self._minX = Math.max(parseFloat(container.offsetLeft), isNaN(parseFloat(container.offsetX)) ? 0 : parseFloat(container.offsetX), isNaN(parseFloat(container.style.left)) ? 0 : parseFloat(container.style.left))
 		self._minY = Math.max(parseFloat(container.offsetTop), isNaN(parseFloat(container.offsetY)) ? 0 : parseFloat(container.offsetY), isNaN(parseFloat(container.style.top)) ? 0 : parseFloat(container.style.top))
 		return rect;
 	}
 	get eventHandler() { return this._eventHandler; }
 	set eventHandler(value) { this._eventHandler = value; }
-	_onMouseDown(evt) {
+	_onMouseDown(event) {
 		const self = this,
 			eventHandler = this.eventHandler;
 
-		if (!(self.isDraggableHeader(evt) ||
-			self === evt.target ||
-			self._dialogContent === evt.target ||
-			self._dialogContent.parentElement === evt.target ||
-			self._dialogButtonPane === evt.target
+		if (!(self.isDraggableHeader(event) ||
+			self === event.target ||
+			self._dialogContent === event.target ||
+			self._dialogContent.parentElement === event.target ||
+			self._dialogButtonPane === event.target
 		)) { return; }
 		self._documentMouseMove_handle = eventHandler.add('mousemove', self._onMouseMove.bind(self), { target: document });
 		self._documentMouseUp_handle = eventHandler.add('mouseup', self._onMouseUp.bind(self), { target: document });
 		const rect = self.maxSize();
 		if (rect.right > self._maxX) { self._maxX = rect.right; }
 		if (rect.bottom > self._maxY) { self._maxY = rect.bottom; }
-		self._startX = evt.pageX;
-		self._startY = evt.pageY;
+		self._startX = event.pageX 
+		self._startY = event.pageY 
 		self._startWidth = self.clientWidth;
 		self._startHeight = self.clientHeight;
 		self._leftPos = rect.left;
 		self._topPos = rect.top;
-		if (self.isDraggableHeader(evt) && self._resizeMode == '') {
+
+		if (self.isDraggableHeader(event) && self._resizeMode == '') {
 			self._setCursor("move");
 			self._isDrag = true;
 			self._dialogTitle.style.cursor = "move";
 		}
 		else if (self.windowState === "normal" && self._resizeMode != '') {
+			const computedStyle = window.getComputedStyle(self);
+			self.resizeState = {
+				startX: event.pageX,
+				startY: event.pageY,
+				startLeft: self.offsetLeft,
+				startTop: self.offsetTop,
+				minX: self.container.offsetLeft,
+				minY: self.container.offsetTop,
+				maxX: self.container.offsetWidth,
+				maxY: self.container.offsetHeight,
+
+				minDeltaX: event.pageX - self.container.offsetLeft,
+				minDeltaY: event.pageY - self.container.offsetTop,
+				maxDeltaX: self.container.clientWidth + self.container.offsetLeft - event.pageX,
+				maxDeltaY: self.container.clientHeight + self.container.offsetTop - event.pageY,
+
+				startWidth: parseInt(self.clientWidth),
+				startHeight: parseInt(self.clientHeight)
+			}
 			self._isResize = true;
 		}
-		if (self === evt.target) {
-			evt.stopPropagation();
+		if (self === event.target) {
+			event.stopPropagation();
 		}
-		evt.preventDefault();
+		event.preventDefault();
+	}
+	resizeDelta(event) {
+		const self = this;
+		if (!self.resizeDelta || !event) { return { deltaX: 0, deltaY: 0 }; }
+		return {
+			deltaX: (event.pageX >= self.resizeState.minX ? event.pageX : self.resizeState.minX) - self.resizeState.startX,
+			deltaY: (event.pageY >= self.resizeState.minY ? event.pageY : self.resizeState.minY) - self.resizeState.startY
+		}
+
 	}
 	inElementBounds(event, element) {
 		const rect = element.getBoundingClientRect(),
@@ -255,14 +278,14 @@ class extends HTMLElement {
 				(target.parentElement && target.parentElement === self._dialogTitle) ||
 				(target.parentElement && target.parentElement.parentElement && target.parentElement.parentElement === self._dialogTitle))
 	}
-	_onMouseMove(evt) {
+	_onMouseMove(event) {
 		const self = this;
-		if (!(self.isDraggableHeader(evt) ||
+		if (!(self.isDraggableHeader(event) ||
 
-			self === evt.target ||
-			self._dialogContent === evt.target ||
-			self._dialogContent.parentElement === evt.target ||
-			self._dialogButtonPane === evt.target) &&
+			self === event.target ||
+			self._dialogContent === event.target ||
+			self._dialogContent.parentElement === event.target ||
+			self._dialogButtonPane === event.target) &&
 			!self._isDrag &&
 			self._resizeMode == '') {
 			return;
@@ -270,51 +293,90 @@ class extends HTMLElement {
 		const thisStyle = window.getComputedStyle(self),
 			borderSize = parseFloat(thisStyle.getPropertyValue("--default-control-border-width")) * parseFloat(thisStyle.getPropertyValue("--default-size"));
 		if (self._isDrag) {
-			self.isDragging(evt, borderSize);
+			self.isDragging(event, borderSize);
 		}
 		else if (self._isResize) {
-			self.isResizing(evt);
-			evt.stopPropagation();
+			self.isResizing(event);
 		}
 
 		else {
-			self.setResizing(evt);
+			self.setResizing(event);
 		}
-		evt.preventDefault();
+		event.preventDefault();
 	};
+	_dialog_resize(event) {
+		const self = this,
+			style = self.style,
+			size = event.detail;
+		if (!event || !event.detail || !event.detail) { return; }
+		if (size.height && size.height >= self._minHeight) {
+			if (size.height) { self._dialog_resize_size.height = size.height }
+			if (size.top) { self._dialog_resize_size.top = size.top }
+		}
 
-	setResizing(evt) {
+		if (size.width && size.width >= self._minWidth) {
+			if (size.width) { self._dialog_resize_size.width = size.width }
+			if (size.left) { self._dialog_resize_size.left = size.left }
+		}
+		window.requestAnimationFrame(() => {
+			if (size.height && size.height >= self._minHeight) {
+				if (size.height) { style.height = `${size.height}px` }
+				if (size.top) { style.top = `${size.top}px`; }
+			}
+			if (size.width && size.width >= self._minWidth) {
+				if (size.width) { style.width = `${size.width}px` }
+				if (size.left) { style.left = `${size.left}px`; }
+			}
+			self._dialog_resize_size = {
+				left: null,
+				top: null,
+				width: null,
+				height: null
+			};
+		});
+	}
+
+	setResizing(event) {
 		const self = this;
 		let cursorStyle, resizeMode = '';
 		if (self.windowState === "normal" &&
-			(self.isDraggableHeader(evt) ||
-				self === evt.target ||
-				self._dialogContent === evt.target ||
-				self._dialogContent.parentElement === evt.target ||
-				self._dialogButtonPane === evt.target)) {
+			(self.isDraggableHeader(event) ||
+				self === event.target ||
+				self._dialogContent === event.target ||
+				self._dialogContent.parentElement === event.target ||
+				self._dialogButtonPane === event.target)) {
 			let rect = self._getOffset(self);
-			if (evt.pageY - self._resizePixel < rect.top + self._resizePixel) {
+			if (event.pageY - self._resizePixel < rect.top + self._resizePixel) {
 				resizeMode = 'n';
 			}
-			else if (evt.pageY + self._resizePixel > rect.bottom - self._resizePixel) {
+			else if (event.pageY + self._resizePixel > rect.bottom - self._resizePixel) {
 				resizeMode = 's';
 			}
-			if (evt.pageX - self._resizePixel < rect.left + self._resizePixel) {
+			if (event.pageX - self._resizePixel < rect.left + self._resizePixel) {
 				resizeMode += 'w';
 			}
-			else if (evt.pageX + self._resizePixel > rect.right - self._resizePixel) {
+			else if (event.pageX + self._resizePixel > rect.right - self._resizePixel) {
 				resizeMode += 'e';
 			}
 		}
 		if (resizeMode !== '' && self._resizeMode !== resizeMode) {
-			if (resizeMode === 'n' || resizeMode === 's')
-				cursorStyle = 'ns-resize';
-			else if (resizeMode === 'e' || resizeMode === 'w')
-				cursorStyle = 'ew-resize';
-			else if (resizeMode === 'ne' || resizeMode === 'sw')
-				cursorStyle = 'nesw-resize';
-			else if (resizeMode === 'nw' || resizeMode === 'se')
-				cursorStyle = 'nwse-resize';
+			switch (resizeMode) {
+				case "n":
+				case "s":
+					cursorStyle = 'ns-resize';
+					break;
+				case "e":
+				case "w":
+					cursorStyle = 'ew-resize';
+					break;
+				case "ne":
+				case "sw":
+					cursorStyle = 'nesw-resize';
+					break;
+				case "nw":
+				case "se":
+					cursorStyle = 'nwse-resize';
+			}
 			self._setCursor(cursorStyle);
 			self._resizeMode = resizeMode;
 		}
@@ -325,189 +387,57 @@ class extends HTMLElement {
 		return resizeMode;
 	}
 
-	isResizing(evt) {
+	isResizing(event) {
 		const self = this;
-		self[`resize_${self._resizeMode}`](evt)
+		self._resizeMode.split("").forEach(resizeType => {
+			self[`resize_${resizeType}`](event)
+		})
+
 		self._setDialogContent();
 	}
-
-	resize_se(evt) {
+	resize_n(event) {
 		const self = this,
-			style = self.style;
-		let dw, dh, w, h;
-		dw = evt.pageX - self._startX;
-		dh = evt.pageY - self._startY;
-		if (self._leftPos + self._startWidth + dw > self._maxX) {
-			dw = self._maxX - self._leftPos - self._startW;
-		}
-		if (self._topPos + self._startHeight + dh > self._maxY) {
-			dh = self._maxY - self._topPos - self._startH;
-		}
-		w = self._startWidth + dw;
-		h = self._startHeight + dh;
-		if (w < self._minWidth) {
-			w = self._minWidth;
-		}
-		if (h < self._minHeight) {
-			h = self._minHeight;
-		}
-		style.width = `${w}px`;
-		style.height = `${h}px`;
+			resizeState = self.resizeState,
+			resizeDelta = self.resizeDelta(event);
+		const dy = Math.min(resizeDelta.deltaY, resizeState.maxDeltaY);
+		self.dispatchEvent(new CustomEvent("mrbr-ui-dialogs-dialog-resize", { detail: { height: resizeState.startHeight - dy, top: Math.max(resizeState.minY, resizeState.startTop + dy) } }))
+	}
+	resize_s(event) {
+		const self = this,
+			resizeState = self.resizeState,
+			resizeDelta = self.resizeDelta(event);
+		self.dispatchEvent(new CustomEvent("mrbr-ui-dialogs-dialog-resize", { detail: { height: resizeState.startHeight + Math.min(resizeDelta.deltaY, resizeState.maxDeltaY) } }))
 	}
 
-	resize_ne(evt) {
+	resize_e(event) {
 		const self = this,
-			style = self.style;
-		let dw, dh, w, h;
-		dw = evt.pageX - self._startX;
-		dh = self._startY - evt.pageY;
-		if (self._leftPos + self._startWidth + dw > self._maxX) {
-			dw = self._maxX - self._leftPos - self._startW;
-		}
-		if (self._topPos - dh < 0) {
-			dh = self._topPos;
-		}
-		w = self._startWidth + dw;
-		h = self._startHeight + dh;
-		if (w < self._minWidth) {
-			w = self._minWidth;
-		}
-		if (h < self._minHeight) {
-			h = self._minHeight;
-			dh = h - self._startH;
-		}
-		style.width = `${w}px`;
-		style.height = `${h}px`;
-		style.top = `${(self._topPos - dh)}px`;
+			resizeState = self.resizeState,
+			resizeDelta = self.resizeDelta(event);
+		self.dispatchEvent(new CustomEvent("mrbr-ui-dialogs-dialog-resize", { detail: { width: resizeState.startWidth + Math.min(resizeDelta.deltaX, resizeState.maxDeltaX) } }))
+
+	}
+	resize_w(event) {
+		const self = this,
+			resizeState = self.resizeState,
+			resizeDelta = self.resizeDelta(event);
+		const dx = Math.min(resizeDelta.deltaX, resizeState.maxDeltaX);
+		self.dispatchEvent(new CustomEvent("mrbr-ui-dialogs-dialog-resize", { detail: { width: resizeState.startWidth - dx, left: Math.max(resizeState.minX, resizeState.startLeft + dx) } }))
 	}
 
-	resize_sw(evt) {
-		const self = this,
-			style = self.style;
-		let dw, dh, w, h;
-		dw = self._startX - evt.pageX;
-		dh = evt.pageY - self._startY;
-		if (self._leftPos - dw < 0) {
-			dw = self._leftPos;
-		}
-		if (self._topPos + self._startHeight + dh > self._maxY) {
-			dh = self._maxY - self._topPos - self._startH;
-		}
-		w = self._startWidth + dw;
-		h = self._startHeight + dh;
-		if (w < self._minWidth) {
-			w = self._minWidth;
-			dw = w - self._startW;
-		}
-		if (h < self._minHeight) {
-			h = self._minHeight;
-		}
-		style.width = `${w}px`;
-		style.height = `${h}px`;
-		style.left = `${(self._leftPos - dw)}px`;
-	}
-
-	resize_nw(evt) {
-		const self = this,
-			style = self.style;
-		let dw, dh, w, h;
-		dw = self._startX - evt.pageX;
-		dh = self._startY - evt.pageY;
-		if (self._leftPos - dw < 0) {
-			dw = self._leftPos;
-		}
-		if (self._topPos - dh < 0) {
-			dh = self._topPos;
-		}
-		w = self._startWidth + dw;
-		h = self._startHeight + dh;
-		if (w < self._minWidth) {
-			w = self._minWidth;
-			dw = w - self._startW;
-		}
-		if (h < self._minHeight) {
-			h = self._minHeight;
-			dh = h - self._startH;
-		}
-		style.width = `${w}px`;
-		style.height = `${h}px`;
-		style.left = `${(self._leftPos - dw)}px`;
-		style.top = `${(self._topPos - dh)}px`;
-	}
-
-	resize_s(evt) {
-		const self = this,
-			style = self.style;
-		let dh, h;
-		dh = evt.pageY - self._startY;
-		if (self._topPos + self._startHeight + dh > self._maxY)
-			dh = self._maxY - self._topPos - self._startH;
-		h = self._startHeight + dh;
-		if (h < self._minHeight) {
-			h = self._minHeight;
-		}
-		style.height = `${h}px`;
-	}
-
-	resize_n(evt) {
-		const self = this,
-			style = self.style;
-		let dh, h;
-		dh = self._startY - evt.pageY;
-		if (self._topPos - dh < 0)
-			dh = self._topPos;
-		h = self._startHeight + dh;
-		if (h < self._minHeight) {
-			h = self._minHeight;
-			dh = h - self._startH;
-		}
-		style.height = `${h}px`;
-		style.top = `${(self._topPos - dh)}px`;
-	}
-
-	resize_e(evt) {
-		const self = this,
-			style = self.style;
-		let dw, w;
-		dw = evt.pageX - self._startX;
-		if (self._leftPos + self._startWidth + dw > self._maxX) { dw = self._maxX - self._leftPos - self._startW; }
-		w = self._startWidth + dw;
-		if (w < self._minWidth) {
-			w = self._minWidth;
-		}
-		style.width = `${w}px`;
-	}
-
-	resize_w(evt) {
-		const self = this,
-			style = self.style;
-		let dw, w;
-		dw = self._startX - evt.pageX;
-		if (self._leftPos - dw < 0)
-			dw = self._leftPos;
-		w = self._startWidth + dw;
-		if (w < self._minWidth) {
-			w = self._minWidth;
-			dw = w - self._startW;
-		}
-		style.width = `${w}px`;
-		style.left = `${(self._leftPos - dw)}px`;
-	}
-
-	isDragging(evt, borderSize) {
+	isDragging(event, borderSize) {
 		const self = this, scrollSize = 32, sizeBuffer = 20,
 			style = self.style;
-		let dx = self._startX - evt.pageX,
-			dy = self._startY - evt.pageY,
-			left = self._leftPos - dx,
-			top = self._topPos - dy,
-			scrollL = Math.max(document.body.scrollLeft, document.documentElement.scrollLeft),
-			scrollT = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
-		if (dx < 0 && left + self._startWidth + borderSize * 2 > self._maxX + self._minX) { left = self._maxX - (self._startWidth + borderSize * 4 + 2) + self._minX; }
-		else if (dx > 0 && left < self._minX) { left = self._minX; }
+		let deltaX = self._startX - event.pageX,
+			deltaY = self._startY - event.pageY,
+			left = self._leftPos - deltaX,
+			top = self._topPos - deltaY,
+			scrollLeft = Math.max(document.body.scrollLeft, document.documentElement.scrollLeft),
+			scrollTop = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+		if (deltaX < 0 && left + self._startWidth + borderSize * 2 > self._maxX + self._minX) { left = self._maxX - (self._startWidth + borderSize * 4 + 2) + self._minX; }
+		else if (deltaX > 0 && left < self._minX) { left = self._minX; }
 
-		if (dy < 0 && top + self._startHeight + borderSize * 2 > self._maxY + self._minY) { top = self._maxY - (self._startHeight + borderSize * 4 + 2) + self._minY }
-		else if (dy > 0 && top < self._minY) { top = self._minY; }
+		if (deltaY < 0 && top + self._startHeight + borderSize * 2 > self._maxY + self._minY) { top = self._maxY - (self._startHeight + borderSize * 4 + 2) + self._minY }
+		else if (deltaY > 0 && top < self._minY) { top = self._minY; }
 
 		self._setCursor("move");
 		self._dialogTitle.style.cursor = "move";
@@ -516,23 +446,23 @@ class extends HTMLElement {
 		if (top + self._startHeight + borderSize * 2 > self._maxY + self._minY) { top = self._maxY - (self._startHeight + borderSize * 4 + 1); }
 		style.left = `${left}px`;
 		style.top = `${top}px`;
-		if (evt.clientY > window.innerHeight - scrollSize) { scrollT += scrollSize; }
-		else if (evt.clientY < scrollSize) { scrollT -= scrollSize; }
-		if (evt.clientX > window.innerWidth - scrollSize) { scrollL += scrollSize; }
-		else if (evt.clientX < scrollSize) { scrollL -= scrollSize; }
-		if (top + self._startHeight == self._maxY) { scrollT = self._maxY - window.innerHeight + sizeBuffer; }
-		else if (top == 0) { scrollT = 0; }
-		if (left + self._startWidth == self._maxX) { scrollL = self._maxX - window.innerWidth + sizeBuffer; }
-		else if (left == 0) { scrollL = 0; }
+		if (event.clientY > window.innerHeight - scrollSize) { scrollTop += scrollSize; }
+		else if (event.clientY < scrollSize) { scrollTop -= scrollSize; }
+		if (event.clientX > window.innerWidth - scrollSize) { scrollLeft += scrollSize; }
+		else if (event.clientX < scrollSize) { scrollLeft -= scrollSize; }
+		if (top + self._startHeight == self._maxY) { scrollTop = self._maxY - window.innerHeight + sizeBuffer; }
+		else if (top == 0) { scrollTop = 0; }
+		if (left + self._startWidth == self._maxX) { scrollLeft = self._maxX - window.innerWidth + sizeBuffer; }
+		else if (left == 0) { scrollLeft = 0; }
 		if (self._startHeight > window.innerHeight) {
-			if (evt.clientY < window.innerHeight / 2) { scrollT = 0; }
-			else { scrollT = self._maxY - window.innerHeight + sizeBuffer; }
+			if (event.clientY < window.innerHeight / 2) { scrollTop = 0; }
+			else { scrollTop = self._maxY - window.innerHeight + sizeBuffer; }
 		}
 		if (self._startWidth > window.innerWidth) {
-			if (evt.clientX < window.innerWidth / 2) { scrollL = 0; }
-			else { scrollL = self._maxX - window.innerWidth + sizeBuffer; }
+			if (event.clientX < window.innerWidth / 2) { scrollLeft = 0; }
+			else { scrollLeft = self._maxX - window.innerWidth + sizeBuffer; }
 		}
-		window.scrollTo(scrollL, scrollT);
+		window.scrollTo(scrollLeft, scrollTop);
 	}
 
 	_onMouseUp(event) {
@@ -556,8 +486,8 @@ class extends HTMLElement {
 	}
 	_getOffset(element) {
 		var rect = element.getBoundingClientRect(),
-			offsetX = window.scrollX || document.documentElement.scrollLeft,
-			offsetY = window.scrollY || document.documentElement.scrollTop;
+			offsetX = self.parentElement && this.parentElement.scrollX || 0,
+			offsetY = self.parentElement && this.parentElement.scrollY || 0;
 		return {
 			left: rect.left + offsetX,
 			top: rect.top + offsetY,
@@ -582,28 +512,15 @@ class extends HTMLElement {
 			_dialogButtonPaneStyle = window.getComputedStyle(self._dialogButtonPane);
 			_dialogButtonPaneStyleBefore = window.getComputedStyle(self._dialogButtonPane, ":before");
 		}
-		const width = self.clientWidth
-			- parseInt(_dialogContentStyle.left)
-			- (parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size")))
-		let height = self.clientHeight - (
-			parseInt(_dialogContentStyle.top)
-			+ (parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size")))
-			+ self._dialogContent.offsetHeight - self._dialogContent.clientHeight
-			+ (self._buttons.length > 1 ?
-				+ parseInt(_dialogButtonPaneStyleBefore.borderBottom ? _dialogButtonPaneStyleBefore.borderBottom : "0")
-				- parseInt(_dialogButtonPaneStyleBefore.top)
-				+ parseInt(_dialogButtonPaneStyle.height)
-				+ parseInt(_dialogButtonPaneStyle.bottom)
-				: 0)
-		);
+		const considerSelfTaskbarSize = self.taskbar && self.taskbar.parentElement === self.parentElement;
 		let bottom = + (parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size"))) * 2
 			+ self._dialogContent.offsetHeight - self._dialogContent.clientHeight
-			+ parseInt(_dialogButtonPaneStyleBefore.borderBottom ? _dialogButtonPaneStyleBefore.borderBottom : "0") * 2
+			+ considerSelfTaskbarSize ? parseInt(_dialogButtonPaneStyleBefore.borderBottom ? _dialogButtonPaneStyleBefore.borderBottom : "0") * 2
 			+ (self._buttons.length > 1 ?
 				- parseInt(_dialogButtonPaneStyleBefore.top)
 				+ parseInt(_dialogButtonPaneStyle.height)
 				+ parseInt(_dialogButtonPaneStyle.bottom)
-				: 0)
+				: 0) : 0
 		self._dialogContent.style.bottom = `${bottom}px`
 	}
 	showDialog() {
@@ -612,9 +529,7 @@ class extends HTMLElement {
 	}
 	createTaskBar() {
 		const self = this;
-		if (self.taskbar !== undefined || !self.taskbarContainer) {
-			return;
-		}
+		if (self.taskbar !== undefined || !self.taskbarContainer) {return;}
 		let taskbar = self.taskbarContainer.querySelector(".mrbr-ui-dialogs-taskbar");
 		if (taskbar !== null) {
 			this.taskbar = taskbar;
@@ -649,30 +564,10 @@ class extends HTMLElement {
 		self._buttons = self.shadowRoot.querySelectorAll('button');
 		let buttonsetStyle = window.getComputedStyle(self._dialogButtonPane.querySelector('.mrbr-ui-dialogs-buttonset')),
 			buttonSetStyleWidth = parseFloat(buttonsetStyle.width);
-		let _dialogStyle = window.getComputedStyle(self),
-			_dialogContentStyle = window.getComputedStyle(self._dialogContent),
-			_dialogButtonPaneStyle,
-			_dialogButtonPaneStyleBefore,
-			_dialogButtonStyle;
-		if (self._buttons.length > 1) {
-			_dialogButtonPaneStyle = window.getComputedStyle(self._dialogButtonPane);
-			_dialogButtonPaneStyleBefore = window.getComputedStyle(self._dialogButtonPane, ":before");
-			_dialogButtonStyle = window.getComputedStyle(self._buttons[1]);
-		}
+		let _dialogContentStyle = window.getComputedStyle(self._dialogContent);
 		self._minWidth = Math.max(self.clientWidth, self._minWidth, buttonSetStyleWidth);
 		style.width = `${self._minWidth}px`;
 
-		self._minHeight = Math.max(self.clientHeight, self._minHeight,
-			+ parseInt(_dialogContentStyle.top)
-			+ (2 * parseInt(_dialogStyle.border))
-			+ parseFloat(_dialogButtonPaneStyleBefore.getPropertyValue("--default-control-height")) * 4
-			+ (self._dialogButtonPane.querySelector('.mrbr-ui-dialogs-buttonset').querySelectorAll("*").length > 1 ?
-				+ parseInt(_dialogButtonPaneStyleBefore.borderBottom)
-				- parseInt(_dialogButtonPaneStyleBefore.top)
-				+ parseInt(_dialogButtonPaneStyle.height)
-				+ parseInt(_dialogButtonPaneStyle.bottom)
-				: 0)
-		);
 		style.height = self._minHeight + 'px';
 
 		self._setDialogContent();
@@ -698,9 +593,7 @@ class extends HTMLElement {
 		mrbrUiDialogsTitle.innerHTML = "";
 		mrbrUiDialogsTitle.appendChild(document.createTextNode(self.title));
 
-		if (!self.taskbarButton) {
-			return;
-		}
+		if (!self.taskbarButton) {return; }
 		self.taskbarButton.querySelector(".mrbr-ui-dialogs-taskbarbutton-title").appendChild(document.createTextNode(self.title));
 
 	}
@@ -733,6 +626,7 @@ class extends HTMLElement {
 		self.dispatchEvent(new CustomEvent("mrbr-control-layer-register", { bubbles: true, composed: true, detail: { source: self } }));
 		self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", { bubbles: true, composed: true, detail: { source: self } }));
 		self._titleChange_handle = eventHandler.add("mrbr-ui-dialogs-title-change", self.setTitle.bind(self), { target: self })
+		self._dialog_resize_handler = eventHandler.add("mrbr-ui-dialogs-dialog-resize", self._dialog_resize.bind(self), { target: self })
 	}
 	controlboxButton_click(event) {
 		this.dispatchEvent(new CustomEvent("controlbox_click", { 'detail': event.target }));
@@ -755,7 +649,9 @@ class extends HTMLElement {
 	minimised(event) {
 		const self = this;
 		const window_getComputedStyle = window.getComputedStyle;
-
+		if (self.windowState !== "minimised") {
+			self.lastWindowState = self.windowState;
+		}
 		self.windowState = "minimised";
 		self.classList.remove("mrbr-ui-dialog-visible");
 		self.classList.add("mrbr-ui-dialog-hidden");
@@ -773,7 +669,7 @@ class extends HTMLElement {
 						self.style.opacity = "";
 						self.classList.add("mrbr-ui-dialog-visible");
 						self._taskbarButtonClick_showDialog_handle = self.eventHandler.remove(self._taskbarButtonClick_showDialog_handle);
-						self.windowState = "normal";
+						self.windowState = self.lastWindowState;
 						self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", { bubbles: true, composed: true, detail: { source: self } }));
 					}
 					self._taskbarButtonClick_showDialog_handle = self.eventHandler.add("click", showDialog, { target: self.taskbarButton })
@@ -945,19 +841,11 @@ class extends HTMLElement {
 				computedStyle = window.getComputedStyle(selected);
 			let cssUrl = computedStyle.backgroundImage;
 			if (cssUrl === undefined) { return; }
-			//const urlRegex = /url\(('|\")data:image\/svg\+xml;utf8,(?<dataUrl>.+?)('|\")\)|url\(\"(?<url>.+?)\"\)/i;
 			const urlRegex = /url\((?:'|\")data:image\/svg\+xml;utf8,(.+?)(?:'|\")\)|url\(\"(.+?)\"\)/i;
 			let m,
 				backgroundImageUrl,
 				isDataUrl = false;
 			if ((m = urlRegex.exec(cssUrl)) !== null) {
-				// if (m.groups.dataUrl && m.groups.dataUrl.length > 0) {
-				// 	backgroundImageUrl = m.groups.dataUrl.trim();
-				// 	isDataUrl = true;
-				// }
-				// else if (m.groups.url && m.groups.url.length > 0) {
-				// 	backgroundImageUrl = m.groups.url.trim();
-				// }
 				if (m[1] && m[1].length > 0) {
 					backgroundImageUrl = m[1].trim();
 					isDataUrl = true;
