@@ -9,8 +9,8 @@ class extends HTMLElement {
             .concat(componentManifest("Mrbr.UI.Navigation.Menu", true, false))
             .concat(componentManifest("Mrbr.UI.Navigation.StartMenu", true, true))
             .concat(componentManifest("Mrbr.UI.Dialogs.Dialog", true, true))
-            //.concat([new entry(entry.FileTypes.Component, "Mrbr.UI.Dialogs.Dialog")])
-            //.concat([new entry(entry.FileTypes.Style, "Mrbr.UI.Dialogs.Dialog")]);
+        //.concat([new entry(entry.FileTypes.Component, "Mrbr.UI.Dialogs.Dialog")])
+        //.concat([new entry(entry.FileTypes.Style, "Mrbr.UI.Dialogs.Dialog")]);
     }
     constructor(config) {
         super();
@@ -102,15 +102,15 @@ class extends HTMLElement {
                     self.classList.add("fadeout");
                     setTimeout(() => {
                         self.navlocation = event.detail.position;
-                        self.dispatchEvent(new CustomEvent("mrbr-ui-desktop-navlocation-change",{detail: self.navlocation}) )
+                        self.dispatchEvent(new CustomEvent("mrbr-ui-desktop-navlocation-change", { detail: self.navlocation }))
                     }, parseFloat(getComputedStyle(document.body).getPropertyValue('--default-control-animation-speed')) * 1000)
                 }
             })
             self.addEventListener("mrbr-control-layer-focused", self.layerFocused.bind(self));
             self.addEventListener("mrbr-control-layer-register", self.layerRegister.bind(self));
             self.addEventListener("mrbr-control-layer-unregister", self.layerUnregister.bind(self));
-            window.requestAnimationFrame(()=>{
-                self.dispatchEvent(new CustomEvent("mrbr-ui-desktop-navlocation-change",{detail: self.navlocation}) )
+            window.requestAnimationFrame(() => {
+                self.dispatchEvent(new CustomEvent("mrbr-ui-desktop-navlocation-change", { detail: self.navlocation }))
             })
         }
     }
@@ -166,16 +166,16 @@ class extends HTMLElement {
     set layers(value) { this._layers = value; }
     layerFocused(event) {
         //event.detail.source.style.zIndex = 100;
- //       debugger
+        //       debugger
         this.relayer(event.detail.source);
     }
     layerRegister(event) {
-   //     debugger
-   const self = this;
+        //     debugger
+        const self = this;
         const target = event.detail.source;
         this.layers.push(target)
         let targetStyleZIndex = target.style.zIndex
-        if(targetStyleZIndex === "" || !targetStyleZIndex){
+        if (targetStyleZIndex === "" || !targetStyleZIndex) {
             target.style.zIndex = self.layers.length * 10;
             //target.style.zIndex = target.style.zIndex ? target.style.zIndex : 0;
         }
@@ -186,12 +186,23 @@ class extends HTMLElement {
     }
     relayer(target) {
         const self = this;
-        let keysSorted = self.layers.sort(function (a, b) { 
+        let keysSorted = self.layers.sort(function (a, b) {
             return parseInt(a.style.zIndex) - parseInt(b.style.zIndex);
         })
-        for (let layerCounter = 0; layerCounter < self.layers.length; layerCounter++) {            
-                keysSorted[layerCounter].style.zIndex = layerCounter * 10;                        
+        for (let layerCounter = 0; layerCounter < self.layers.length; layerCounter++) {
+            if (keysSorted[layerCounter].pin === "pinned") {
+                keysSorted[layerCounter].style.zIndex = self.layers.length * 10 + layerCounter * 10;
+            }
+            else {
+                keysSorted[layerCounter].style.zIndex = layerCounter * 10;
+            }
         }
-        target.style.zIndex = self.layers.length * 10+1;
+        if (target.pin === "pinned") {
+            target.style.zIndex = target.style.zIndex *10 + 1 +  self.layers.length;
+        }
+        else {
+            target.style.zIndex = self.layers.length * 10 + 1;
+        }
+
     }
 }

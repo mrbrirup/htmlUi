@@ -53,10 +53,31 @@ class extends HTMLElement {
 			return this.getAttribute("title");
 		}
 	}
+	pinDialog(event) {
+		if (this.pin === "pin") {
+			this.pin = "pinned"
+		}
+		else {
+			this.pin = "pin";
+		}
+	}
+	get pin() {
+		if (!this.hasAttribute("pin")) {
+			return ""
+		}
+		else {
+			return this.getAttribute("pin");
+		}
+	}
+	set pin(value) {
+		this.setAttribute("pin", value);
+		console.log(this.pin)
+	}
 	get container() { return this._container }
 	set container(value) { this._container = value; }
 	static get EVENTS() {
 		return {
+			pin: "mrbr-ui-dialogs-events-pin",
 			minimised: "mrbr-ui-dialogs-events-minimised",
 			maximised: "mrbr-ui-dialogs-events-maximised",
 			activated: "mrbr-ui-dialogs-events-activated",//	Occurs when the form is activated in code or by the user.
@@ -213,8 +234,8 @@ class extends HTMLElement {
 		const rect = self.maxSize();
 		if (rect.right > self._maxX) { self._maxX = rect.right; }
 		if (rect.bottom > self._maxY) { self._maxY = rect.bottom; }
-		self._startX = event.pageX 
-		self._startY = event.pageY 
+		self._startX = event.pageX
+		self._startY = event.pageY
 		self._startWidth = self.clientWidth;
 		self._startHeight = self.clientHeight;
 		self._leftPos = rect.left;
@@ -529,7 +550,7 @@ class extends HTMLElement {
 	}
 	createTaskBar() {
 		const self = this;
-		if (self.taskbar !== undefined || !self.taskbarContainer) {return;}
+		if (self.taskbar !== undefined || !self.taskbarContainer) { return; }
 		let taskbar = self.taskbarContainer.querySelector(".mrbr-ui-dialogs-taskbar");
 		if (taskbar !== null) {
 			this.taskbar = taskbar;
@@ -593,7 +614,7 @@ class extends HTMLElement {
 		mrbrUiDialogsTitle.innerHTML = "";
 		mrbrUiDialogsTitle.appendChild(document.createTextNode(self.title));
 
-		if (!self.taskbarButton) {return; }
+		if (!self.taskbarButton) { return; }
 		self.taskbarButton.querySelector(".mrbr-ui-dialogs-taskbarbutton-title").appendChild(document.createTextNode(self.title));
 
 	}
@@ -609,7 +630,8 @@ class extends HTMLElement {
 			[
 				controlboxRight.querySelector("button[name='mrbr-ui-dialogs-controlbox-min']"),
 				controlboxRight.querySelector("button[name='mrbr-ui-dialogs-controlbox-max']"),
-				controlboxRight.querySelector("button[name='mrbr-ui-dialogs-controlbox-close']")
+				controlboxRight.querySelector("button[name='mrbr-ui-dialogs-controlbox-close']"),
+				controlboxRight.querySelector("button[name='mrbr-ui-dialogs-controlbox-pin']")
 			].forEach(btn => {
 				if (btn === undefined) { return; }
 				self.controlboxButtons.push(btn);
@@ -620,6 +642,7 @@ class extends HTMLElement {
 		self._minimised_handle = eventHandler.add(Mrbr.UI.Dialogs.Dialog.EVENTS.minimised, self.minimised.bind(self), { target: self })
 		self._maximised_handle = eventHandler.add(Mrbr.UI.Dialogs.Dialog.EVENTS.maximised, self.maximised.bind(self), { target: self })
 		self._closing_handle = eventHandler.add(Mrbr.UI.Dialogs.Dialog.EVENTS.closing, self.closing.bind(self), { target: self })
+		self._pin_handle = eventHandler.add(Mrbr.UI.Dialogs.Dialog.EVENTS.pin, self.pinDialog.bind(self), { target: self })
 		self._mousedown_handle = eventHandler.add("mousedown", event => {
 			self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", { bubbles: true, composed: true, detail: { source: self } }));
 		});
@@ -628,6 +651,7 @@ class extends HTMLElement {
 		self._titleChange_handle = eventHandler.add("mrbr-ui-dialogs-title-change", self.setTitle.bind(self), { target: self })
 		self._dialog_resize_handler = eventHandler.add("mrbr-ui-dialogs-dialog-resize", self._dialog_resize.bind(self), { target: self })
 	}
+
 	controlboxButton_click(event) {
 		this.dispatchEvent(new CustomEvent("controlbox_click", { 'detail': event.target }));
 	}
@@ -643,6 +667,9 @@ class extends HTMLElement {
 				break;
 			case "mrbr-ui-dialogs-controlbox-close":
 				window.requestAnimationFrame(() => self.dispatchEvent(new CustomEvent(Mrbr.UI.Dialogs.Dialog.EVENTS.closing, { detail: { event, cancelClose: false } })))
+				break;
+			case "mrbr-ui-dialogs-controlbox-pin":
+				window.requestAnimationFrame(() => self.dispatchEvent(new CustomEvent(Mrbr.UI.Dialogs.Dialog.EVENTS.pin, { detail: { event } })))
 				break;
 		}
 	}

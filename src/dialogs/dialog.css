@@ -33,7 +33,7 @@
 	user-select: none;
 }
 
-:host[windowstate='normal'] .mrbr-ui-dialogs-titlebar {
+:host([windowstate='normal']) .mrbr-ui-dialogs-titlebar {
 	cursor: move;
 }
 
@@ -146,11 +146,22 @@
 	background-image: url("ui/resources/images/svg/dialogs/minimise.svg");
 }
 
-:host .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'], :host[windowstate='normal'] .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'] {
+:host .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'], :host([windowstate='normal']) .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'] {
 	background-image: url("ui/resources/images/svg/dialogs/maximise.svg");
 }
+:host(:not([pin])) .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-pin'] {
+	display: none;
+}
+:host([pin='pin']) .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-pin'] 
+{
+	background-image: url("ui/resources/images/svg/dialogs/pin.svg");
+}
+:host([pin='pinned']) .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-pin'] 
+{
+	background-image: url("ui/resources/images/svg/dialogs/pinned.svg");
+}
 
-:host[windowstate='maximised'] .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'] {
+:host([windowstate='maximised']) .mrbr-ui-dialogs-titlebar button[name='mrbr-ui-dialogs-controlbox-max'] {
 	background-image: url("ui/resources/images/svg/dialogs/restore.svg");
 }
 
