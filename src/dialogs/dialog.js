@@ -54,12 +54,14 @@ class extends HTMLElement {
 		}
 	}
 	pinDialog(event) {
-		if (this.pin === "pin") {
-			this.pin = "pinned"
+		const self = this;
+		if (self.pin === "pin") {
+			self.pin = "pinned"
 		}
 		else {
-			this.pin = "pin";
+			self.pin = "pin";
 		}
+		self.dispatchEvent(new CustomEvent("mrbr-control-layer-focused", { bubbles: true, composed: true, detail: { source: self } }));
 	}
 	get pin() {
 		if (!this.hasAttribute("pin")) {
@@ -71,7 +73,6 @@ class extends HTMLElement {
 	}
 	set pin(value) {
 		this.setAttribute("pin", value);
-		console.log(this.pin)
 	}
 	get container() { return this._container }
 	set container(value) { this._container = value; }
