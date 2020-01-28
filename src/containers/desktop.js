@@ -9,7 +9,10 @@ class extends HTMLElement {
             .concat(componentManifest("Mrbr.UI.Navigation.Menu", true, false))
             .concat(componentManifest("Mrbr.UI.Navigation.StartMenu", true, true))
             .concat(componentManifest("Mrbr.UI.Dialogs.Dialog", true, true))
-        //.concat([new entry(entry.FileTypes.Component, "Mrbr.UI.Dialogs.Dialog")])
+            .concat(componentManifest("Mrbr.UI.Widgets.AssemblyMonitor", true, true))
+            //.concat([new entry(entry.FileTypes.Component, "Mrbr.UI.Widgets.AssemblyMonitor")])
+            
+            //.concat([new entry(entry.FileTypes.Component, "Mrbr.UI.Dialogs.Dialog")])
         //.concat([new entry(entry.FileTypes.Style, "Mrbr.UI.Dialogs.Dialog")]);
     }
     constructor(config) {

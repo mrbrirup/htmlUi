@@ -115,6 +115,12 @@
 :host button {
 	color: var(--default-colour-button-text);
 }
+:host .mrbr-ui-dialogs-buttonbar button{
+	border-radius: var( --default-border-radius);
+	background-color: var( --default-colour-button-face);
+	border: var(--default-control-border-width) var(--default-colour-button-hilight);
+	border-style: outset;	
+}
 
 :host button:hover, :host button.active {
 	cursor: pointer;

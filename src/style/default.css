@@ -2,6 +2,7 @@
     --default-control-font: "Arial";
     --default-control-padding: 0.25rem;
     --default-size: 12;
+    --default-border-radius: calc(var(--default-size) * 0.17px);
     --default-control-height: calc(var(--default-size) * 1.5px);
     --default-control-width: calc(var(--default-size) * 1.5px);
     --default-control-font-name: Arial, Helvetica Neue, Helvetica, sans-serif;
