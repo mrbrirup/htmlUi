@@ -8,7 +8,7 @@ class extends HTMLElement {
             .concat(componentManifest("Mrbr.UI.Widgets.TaskbarSettings", true, true))
             .concat(componentManifest("Mrbr.UI.Navigation.Menu", true, false))
             .concat(componentManifest("Mrbr.UI.Navigation.StartMenu", true, true))
-            .concat(componentManifest("Mrbr.UI.Dialogs.Dialog", true, true))
+            //.concat(componentManifest("Mrbr.UI.Dialogs.Dialog", true, true))
             .concat(componentManifest("Mrbr.UI.Widgets.AssemblyMonitor", true, true))
             //.concat([new entry(entry.FileTypes.Component, "Mrbr.UI.Widgets.AssemblyMonitor")])
             
@@ -109,6 +109,12 @@ class extends HTMLElement {
                     }, parseFloat(getComputedStyle(document.body).getPropertyValue('--default-control-animation-speed')) * 1000)
                 }
             })
+            self.assemblyMonitor = new Mrbr.UI.Widgets.AssemblyMonitor({desktop:self})
+            //self.assemblyMonitor = new Mrbr.UI.Widgets.AssemblyMonitor()
+            // d.style.width = "24px"
+            // d.style.height = "24px"
+            // d.style.backgroundColor = "red";
+            self.controlBox.prepend(self.assemblyMonitor);
             self.addEventListener("mrbr-control-layer-focused", self.layerFocused.bind(self));
             self.addEventListener("mrbr-control-layer-register", self.layerRegister.bind(self));
             self.addEventListener("mrbr-control-layer-unregister", self.layerUnregister.bind(self));

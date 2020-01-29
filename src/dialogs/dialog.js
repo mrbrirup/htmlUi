@@ -414,7 +414,6 @@ class extends HTMLElement {
 		self._resizeMode.split("").forEach(resizeType => {
 			self[`resize_${resizeType}`](event)
 		})
-
 		self._setDialogContent();
 	}
 	resize_n(event) {
@@ -530,19 +529,17 @@ class extends HTMLElement {
 			_dialogContentStyle = window.getComputedStyle(self._dialogContent);
 		let _dialogButtonPaneStyle,
 			_dialogButtonPaneStyleBefore;
-		if (self._buttons.length > 1) {
-			_dialogButtonPaneStyle = window.getComputedStyle(self._dialogButtonPane);
-			_dialogButtonPaneStyleBefore = window.getComputedStyle(self._dialogButtonPane, ":before");
-		}
-		const considerSelfTaskbarSize = self.taskbar && self.taskbar.parentElement === self.parentElement;
-		let bottom = + (parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size"))) * 2
+		//if (self._buttons.length > 1) {
+		_dialogButtonPaneStyle = window.getComputedStyle(self._dialogButtonPane);
+		_dialogButtonPaneStyleBefore = window.getComputedStyle(self._dialogButtonPane, ":before");
+		//}
+		const considerSelfTaskbarSize = ((self.taskbar !== null && self.taskbar !== undefined) && (self.taskbar.parentElement === self.parentElement));
+		let bottom = (parseFloat(_dialogContentStyle.getPropertyValue("--default-control-padding")) * parseFloat(_dialogContentStyle.getPropertyValue("--default-size"))) * 2
 			+ self._dialogContent.offsetHeight - self._dialogContent.clientHeight
 			+ considerSelfTaskbarSize ? parseInt(_dialogButtonPaneStyleBefore.borderBottom ? _dialogButtonPaneStyleBefore.borderBottom : "0") * 2
-			+ (self._buttons.length > 1 ?
-				- parseInt(_dialogButtonPaneStyleBefore.top)
-				+ parseInt(_dialogButtonPaneStyle.height)
-				+ parseInt(_dialogButtonPaneStyle.bottom)
-				: 0) : 0
+			- parseInt(_dialogButtonPaneStyleBefore.top)
+			+ parseInt(_dialogButtonPaneStyle.height)
+			+ parseInt(_dialogButtonPaneStyle.bottom) : 0;
 		self._dialogContent.style.bottom = `${bottom}px`
 	}
 	showDialog() {
@@ -592,7 +589,6 @@ class extends HTMLElement {
 
 		style.height = self._minHeight + 'px';
 
-		self._setDialogContent();
 		style.left = ((window.innerWidth - self.clientWidth) / 2) + 'px';
 		style.top = ((window.innerHeight - self.clientHeight) / 2) + 'px';
 
@@ -606,6 +602,9 @@ class extends HTMLElement {
 		self.wireEvents();
 		self.createTaskBar();
 		self.setTitle();
+		//self.click();		
+		//self.resize_n();
+		self._setDialogContent();
 		self.classList.add("mrbr-ui-dialog-visible");
 	}
 	setTitle() {
@@ -808,7 +807,7 @@ class extends HTMLElement {
 		self.style.top = `${self._minY}px`;
 		self.windowState = "maximised";
 	}
-	window_resizing() {
+	window_resizing(event) {
 		const self = this;
 		self.maxSize();
 		self.maximiseDialog.bind(self)(event)

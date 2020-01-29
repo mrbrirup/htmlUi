@@ -3,55 +3,67 @@ class extends HTMLElement {
     constructor(...args) {
         super();
         // element created
-        
+        this._pendingCount = 0;
         const self = this;
         self._template = Mrbr.UI.Utils.Utils.template("Mrbr.UI.Widgets.AssemblyMonitor");
         self._eventHandler = new Mrbr.System.EventHandler({ target: self });
         self.assembly = Mrbr.System.Assembly;
-        self.assembly.fileInterceptor.wrap(
-            self.loading.bind(self),
-            self.loaded.bind(self),
-            self
-        )
-        self.shadowroot = self.attachShadow({mode:'open'})
-        self.shadowroot.innerHTML = self._template ;
+
+        //        self.assembly.fileInterceptor.pre(
+        //         new function(){},
+        //         //self.loaded.bind(self),
+        //         self
+        //    )
+        self.shadowroot = self.attachShadow({ mode: 'open' })
+        self.shadowroot.innerHTML = self._template;
         self.countLabel = self.shadowroot.querySelector("div");
         self._loaded_handle = self._eventHandler.add('mrbr-ui-widgets-assemblymonitor-loaded', self._onLoading.bind(self), { target: self });
         self._loading_handle = self._eventHandler.add('mrbr-ui-widgets-assemblymonitor-loading', self._onLoaded.bind(self), { target: self });
-        if(args && args[0] && args[0].desktop ){
-            
+        if (args && args[0] && args[0].desktop) {
+
             self.desktop = args[0].desktop;
-            self.desktop.addEventListener("mrbr-ui-desktop-navlocation-change", event=> self.navlocation = event.detail )
+            self.desktop.addEventListener("mrbr-ui-desktop-navlocation-change", event => self.navlocation = event.detail)
             //self.dispatchEvent(new CustomEvent(, { detail: self.navlocation }))
         }
     }
-    loaded(entry){  
+    loaded(entry) {
         const self = this;
-        self.dispatchEvent(new CustomEvent("mrbr-ui-widgets-assemblymonitor-loaded",{detail:{entry:entry}}));      
+        //self.dispatchEvent(new CustomEvent("mrbr-ui-widgets-assemblymonitor-loaded", { detail: { entry: entry } }));
         return entry;
     }
-    loading(entry){
-        self.dispatchEvent(new CustomEvent("mrbr-ui-widgets-assemblymonitor-loading",{detail:{entry:entry}}));      
+    loading(entry,b,c,d,e) {
+        debugger
+        const self = this;
+        //self.dispatchEvent(new CustomEvent("mrbr-ui-widgets-assemblymonitor-loading", { detail: { entry: entry } }));
         return entry;
     }
-    _onLoading(event){
-        self.pendingCount++;
-        console.log(`Loading: ${event.detail.entry.url}`)
-    }
-    _onLoaded(event){
-        self.pendingCount--;
-        console.log(`Loaded: ${event.detail.entry.url}`)
-    }
-    get pendingCount(){return this._pendingCount;}
-    set pendingCount(value){
+    _onLoading(event) {
         const self = this;
-         self._pendingCount = value; 
-        window.requestAnimationFrame(()=>{
+        //self.pendingCount = self.pendingCount+1;
+        //console.log(`Loading: ${event.detail.entry.url}`)
+    }
+    _onLoaded(event) {
+        const self = this;
+        //self.pendingCount = self.pendingCount-1;
+        //console.log(`Loaded: ${event.detail.entry.url}`)
+        
+    }
+    get pendingCount() { return this._pendingCount; }
+    set pendingCount(value) {
+        const self = this;
+        self._pendingCount = value;
+        window.requestAnimationFrame(() => {
             self.countLabel.innerHTML = value;
         })
     }
     connectedCallback() {
         this.pendingCount = 0;
+        const self = this;
+        self.assembly.fileInterceptor.post(
+            self.loading.bind(self),
+            //self.loaded.bind(self),
+            self
+        )
         // browser calls this method when the element is added to the document
         // (can be called many times if an element is repeatedly added/removed)
     }
