@@ -29,13 +29,13 @@ class extends HTMLElement {
     loaded(entry) {
         const self = this;
         //self.dispatchEvent(new CustomEvent("mrbr-ui-widgets-assemblymonitor-loaded", { detail: { entry: entry } }));
-        return entry;
+       // return entry;
     }
     loading(entry,b,c,d,e) {
         debugger
         const self = this;
         //self.dispatchEvent(new CustomEvent("mrbr-ui-widgets-assemblymonitor-loading", { detail: { entry: entry } }));
-        return entry;
+     //   return entry;
     }
     _onLoading(event) {
         const self = this;
@@ -59,7 +59,7 @@ class extends HTMLElement {
     connectedCallback() {
         this.pendingCount = 0;
         const self = this;
-        self.assembly.fileInterceptor.post(
+        self.assembly.fileInterceptor.pre(
             self.loading.bind(self),
             //self.loaded.bind(self),
             self
