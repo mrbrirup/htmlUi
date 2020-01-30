@@ -17,8 +17,10 @@ class extends HTMLElement {
         self.shadowroot = self.attachShadow({ mode: 'open' })
         self.shadowroot.innerHTML = self._template;
         self.countLabel = self.shadowroot.querySelector("div");
-        self._loaded_handle = self._eventHandler.add('mrbr-ui-widgets-assemblymonitor-loaded', self._onLoading.bind(self), { target: self });
-        self._loading_handle = self._eventHandler.add('mrbr-ui-widgets-assemblymonitor-loading', self._onLoaded.bind(self), { target: self });
+        //self._loaded_handle = self._eventHandler.add('mrbr-ui-widgets-assemblymonitor-loaded', self._onLoading.bind(self), { target: self });
+        self.assembly.loader.on(self.assembly.EVENTS.loadStart, self.onStart.bind(self))
+        self.assembly.loader.on(self.assembly.EVENTS.loadComplete, self.onComplete.bind(self))
+        //self._loading_handle = self._eventHandler.add('mrbr-ui-widgets-assemblymonitor-loading', self._onLoaded.bind(self), { target: self });
         if (args && args[0] && args[0].desktop) {
 
             self.desktop = args[0].desktop;
@@ -26,20 +28,26 @@ class extends HTMLElement {
             //self.dispatchEvent(new CustomEvent(, { detail: self.navlocation }))
         }
     }
-    loaded(entry) {
+    onComplete(event) {
         const self = this;
         //self.dispatchEvent(new CustomEvent("mrbr-ui-widgets-assemblymonitor-loaded", { detail: { entry: entry } }));
        // return entry;
+       console.log("OnComplete", event)
+       setTimeout(() => {
+           self.pendingCount = self.pendingCount-1;
+           
+       }, 1000);
     }
-    loading(entry,b,c,d,e) {
-        debugger
+    onStart(event,b,c,d,e) {
+        //debugger
         const self = this;
         //self.dispatchEvent(new CustomEvent("mrbr-ui-widgets-assemblymonitor-loading", { detail: { entry: entry } }));
      //   return entry;
+     self.pendingCount = self.pendingCount+1;
+     console.log("OnStart", event)
     }
     _onLoading(event) {
         const self = this;
-        //self.pendingCount = self.pendingCount+1;
         //console.log(`Loading: ${event.detail.entry.url}`)
     }
     _onLoaded(event) {
@@ -52,18 +60,19 @@ class extends HTMLElement {
     set pendingCount(value) {
         const self = this;
         self._pendingCount = value;
-        window.requestAnimationFrame(() => {
+        //window.requestAnimationFrame(() => {
             self.countLabel.innerHTML = value;
-        })
+        //})
+        console.log(value)
     }
     connectedCallback() {
         this.pendingCount = 0;
         const self = this;
-        self.assembly.fileInterceptor.pre(
-            self.loading.bind(self),
-            //self.loaded.bind(self),
-            self
-        )
+        // self.assembly.fileInterceptor.pre(
+        //     self.loading.bind(self),
+        //     //self.loaded.bind(self),
+        //     self
+        // )
         // browser calls this method when the element is added to the document
         // (can be called many times if an element is repeatedly added/removed)
     }
