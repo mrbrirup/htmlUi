@@ -1,4 +1,7 @@
-:host{all:initial}
+:host {
+    all: initial
+}
+
 :host {
     display: flex;
     box-sizing: border-box;
@@ -12,19 +15,50 @@
 :host([navlocation="left"]), :host([navlocation="right"]) {
     /*height: var(--default-icon-size-0);*/
     /* height: var(--default-control-menu-height); */
-    height:var(--default-control-toolbar-size);
+    height: var(--default-control-toolbar-size);
     width: 100%;
 }
-:host > div{
+
+:host>div {
     margin: auto;
     font-family: var(--default-control-font-name);
     font-size: var(--default-control-caption-font-size);
+    user-select: none;
 }
-/* :host>mrbr-ui-navigation-menu {
-    width: 100%;
-    height: 100%;
-    background-image: url("ui/resources/images/svg/action/ic_settings_24px.svg");
-    background-size: var(--default-icon-size-0) var(--default-icon-size-0);
-    background-position: center center;
-    background-repeat: no-repeat;
-} */
+
+:host .mrbr-system-eventhandler-counter {
+    position: absolute;
+    margin: auto;
+    z-index: 1;
+    padding: var(--default-control-padding);
+}
+
+:host .mrbr-system-eventhandler-loader {
+    z-index: 0;
+    border: var(--default-control-border-width) solid var(--default-control-background-color-alpha);
+    border-top: var(--default-control-border-width) solid var(--default-colour-hot-tracking-color);
+    border-radius: 50%;
+    width: var(--default-control-height);
+    height: var(--default-control-height);
+    animation: spin calc(var(--default-control-animation-speed)*4) linear infinite;
+    box-sizing: border-box;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+:host .mrbr-system-eventhandler-loader.mrbr-system-eventhandler-hidden {
+    opacity: 0;
+    transition: ease 2s opacity;
+}
+
+:host .mrbr-system-eventhandler-loader.mrbr-system-eventhandler-display {
+    opacity: 1;
+    transition: ease 2s opacity;
+}
